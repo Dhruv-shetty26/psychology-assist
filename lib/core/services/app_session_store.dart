@@ -63,16 +63,22 @@ class AppSessionStore {
       'profile':
           session.profile == null ? null : _profileToJson(session.profile!),
       'appointments': session.appointments.map(_appointmentToJson).toList(),
+      'prescriptions': session.prescriptions.map(_prescriptionToJson).toList(),
       'moodEntries': session.moodEntries.map(_moodEntryToJson).toList(),
       'prescriptions': session.prescriptions.map(_prescriptionToJson).toList(),
       'lastUnlockedAt': session.lastUnlockedAt?.toIso8601String(),
       'lockTimeoutMinutes': session.lockTimeoutMinutes,
+      'journalSummary': session.journalSummary,
+      'journalUpdatedAt': session.journalUpdatedAt?.toIso8601String(),
     };
   }
 
   AppSession _sessionFromJson(Map<String, dynamic> json) {
     final appointments = (json['appointments'] as List<dynamic>? ?? [])
         .map((item) => _appointmentFromJson(item as Map<String, dynamic>))
+        .toList();
+    final prescriptions = (json['prescriptions'] as List<dynamic>? ?? [])
+        .map((item) => _prescriptionFromJson(item as Map<String, dynamic>))
         .toList();
     final moodEntries = (json['moodEntries'] as List<dynamic>? ?? [])
         .map((item) => _moodEntryFromJson(item as Map<String, dynamic>))
@@ -89,12 +95,17 @@ class AppSessionStore {
           ? null
           : _profileFromJson(json['profile'] as Map<String, dynamic>),
       appointments: appointments,
+      prescriptions: prescriptions,
       moodEntries: moodEntries,
       prescriptions: prescriptions,
       lastUnlockedAt: json['lastUnlockedAt'] == null
           ? null
           : DateTime.tryParse(json['lastUnlockedAt'] as String),
       lockTimeoutMinutes: json['lockTimeoutMinutes'] as int? ?? 10,
+      journalSummary: json['journalSummary'] as String? ?? '',
+      journalUpdatedAt: json['journalUpdatedAt'] == null
+          ? null
+          : DateTime.tryParse(json['journalUpdatedAt'] as String),
     );
   }
 
@@ -156,6 +167,34 @@ class AppSessionStore {
       type: json['type'] as String? ?? 'Video session',
       note: json['note'] as String? ?? '',
       confirmed: json['confirmed'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> _prescriptionToJson(Prescription prescription) {
+    return {
+      'patientName': prescription.patientName,
+      'patientEmail': prescription.patientEmail,
+      'prescribedByName': prescription.prescribedByName,
+      'prescribedByEmail': prescription.prescribedByEmail,
+      'medicines': prescription.medicines,
+      'note': prescription.note,
+      'createdAt': prescription.createdAt.toIso8601String(),
+    };
+  }
+
+  Prescription _prescriptionFromJson(Map<String, dynamic> json) {
+    return Prescription(
+      patientName: json['patientName'] as String? ?? 'Patient',
+      patientEmail: json['patientEmail'] as String?,
+      prescribedByName: json['prescribedByName'] as String? ?? 'Psychologist',
+      prescribedByEmail:
+          json['prescribedByEmail'] as String? ?? demoPsychologistEmail,
+      medicines: (json['medicines'] as List<dynamic>?)
+              ?.map((item) => item as String)
+              .toList() ??
+          const [],
+      note: json['note'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String),
     );
   }
 

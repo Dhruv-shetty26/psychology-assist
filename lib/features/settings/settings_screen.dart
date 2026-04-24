@@ -9,6 +9,7 @@ import '../../app/user_preferences_provider.dart';
 import '../../core/services/notification_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/smooth_widgets.dart';
 import '../../core/widgets/animations.dart';
 import '../notifications/notifications_screen.dart';
@@ -425,6 +426,51 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           title: const Text('Report a Bug'),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: _showBugReport,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              _SettingsSection(
+                title: 'Account',
+                children: [
+                  SmoothCard(
+                    padding: const EdgeInsets.all(16),
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .errorContainer
+                        .withOpacity(0.12),
+                    borderColor:
+                        Theme.of(context).colorScheme.error.withOpacity(0.2),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          'Switch account without deleting data',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: theme.textTheme.bodySmall?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: theme.colorScheme.errorContainer
+                                .withOpacity(0.9),
+                          ),
+                          onPressed: () {
+                            ref.read(appSessionProvider.notifier).logout();
+                            AppSnackBar.showInfo(
+                              context,
+                              title: 'Logged out',
+                              message:
+                                  'You can now sign in again as a patient or psychologist.',
+                            );
+                          },
+                          icon: const Icon(Icons.logout),
+                          label: const Text('Log out / switch account'),
                         ),
                       ],
                     ),

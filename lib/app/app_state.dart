@@ -96,6 +96,86 @@ class Appointment {
   }
 }
 
+/// Represents a medication time for prescription reminders
+class MedicationTime {
+  final int hour;
+  final int minute;
+
+  const MedicationTime({
+    required this.hour,
+    required this.minute,
+  });
+
+  String toDisplayString() =>
+      '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+
+  MedicationTime copyWith({
+    int? hour,
+    int? minute,
+  }) {
+    return MedicationTime(
+      hour: hour ?? this.hour,
+      minute: minute ?? this.minute,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MedicationTime &&
+          runtimeType == other.runtimeType &&
+          hour == other.hour &&
+          minute == other.minute;
+
+  @override
+  int get hashCode => hour.hashCode ^ minute.hashCode;
+}
+
+class Prescription {
+  final String patientName;
+  final String? patientEmail;
+  final String prescribedByName;
+  final String prescribedByEmail;
+  final List<String> medicines;
+  final List<MedicationTime>
+      reminderTimes; // Times to receive medication reminders
+  final String note;
+  final DateTime createdAt;
+
+  const Prescription({
+    required this.patientName,
+    this.patientEmail,
+    required this.prescribedByName,
+    required this.prescribedByEmail,
+    required this.medicines,
+    this.reminderTimes = const [],
+    required this.note,
+    required this.createdAt,
+  });
+
+  Prescription copyWith({
+    String? patientName,
+    String? patientEmail,
+    String? prescribedByName,
+    String? prescribedByEmail,
+    List<String>? medicines,
+    List<MedicationTime>? reminderTimes,
+    String? note,
+    DateTime? createdAt,
+  }) {
+    return Prescription(
+      patientName: patientName ?? this.patientName,
+      patientEmail: patientEmail ?? this.patientEmail,
+      prescribedByName: prescribedByName ?? this.prescribedByName,
+      prescribedByEmail: prescribedByEmail ?? this.prescribedByEmail,
+      medicines: medicines ?? this.medicines,
+      reminderTimes: reminderTimes ?? this.reminderTimes,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+}
+
 class MoodEntry {
   final DateTime createdAt;
   final int value;
@@ -187,17 +267,34 @@ const demoPsychologists = [
   ),
 ];
 
+const demoMedicines = [
+  'Prozac',
+  'Valium',
+  'Sertraline',
+  'Lexapro',
+  'Wellbutrin',
+  'Zoloft',
+  'Buspirone',
+  'Melatonin',
+  'Hydroxyzine',
+];
+
 class AppSession {
   final bool onboardingComplete;
   final bool appLockSet;
   final String? lockPin;
   final AppProfile? profile;
   final List<Appointment> appointments;
+  final List<Prescription> prescriptions;
   final List<MoodEntry> moodEntries;
   final List<Prescription> prescriptions;
   final bool isLocked;
   final DateTime? lastUnlockedAt;
   final int lockTimeoutMinutes;
+  final int currentStreak;
+  final int longestStreak;
+  final String journalSummary;
+  final DateTime? journalUpdatedAt;
 
   const AppSession({
     this.onboardingComplete = false,
@@ -205,11 +302,16 @@ class AppSession {
     this.lockPin,
     this.profile,
     this.appointments = const [],
+    this.prescriptions = const [],
     this.moodEntries = const [],
     this.prescriptions = const [],
     this.isLocked = false,
     this.lastUnlockedAt,
     this.lockTimeoutMinutes = 10,
+    this.currentStreak = 0,
+    this.longestStreak = 0,
+    this.journalSummary = '',
+    this.journalUpdatedAt,
   });
 
   AppSession copyWith({
@@ -218,11 +320,16 @@ class AppSession {
     String? lockPin,
     AppProfile? profile,
     List<Appointment>? appointments,
+    List<Prescription>? prescriptions,
     List<MoodEntry>? moodEntries,
     List<Prescription>? prescriptions,
     bool? isLocked,
     DateTime? lastUnlockedAt,
     int? lockTimeoutMinutes,
+    int? currentStreak,
+    int? longestStreak,
+    String? journalSummary,
+    DateTime? journalUpdatedAt,
   }) {
     return AppSession(
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
@@ -230,11 +337,16 @@ class AppSession {
       lockPin: lockPin ?? this.lockPin,
       profile: profile ?? this.profile,
       appointments: appointments ?? this.appointments,
+      prescriptions: prescriptions ?? this.prescriptions,
       moodEntries: moodEntries ?? this.moodEntries,
       prescriptions: prescriptions ?? this.prescriptions,
       isLocked: isLocked ?? this.isLocked,
       lastUnlockedAt: lastUnlockedAt ?? this.lastUnlockedAt,
       lockTimeoutMinutes: lockTimeoutMinutes ?? this.lockTimeoutMinutes,
+      currentStreak: currentStreak ?? this.currentStreak,
+      longestStreak: longestStreak ?? this.longestStreak,
+      journalSummary: journalSummary ?? this.journalSummary,
+      journalUpdatedAt: journalUpdatedAt ?? this.journalUpdatedAt,
     );
   }
 }
@@ -306,36 +418,81 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
     _persist();
   }
 
-  void addMoodEntry(MoodEntry entry) {
-    final updated = [...state.moodEntries, entry]
-      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    state = state.copyWith(moodEntries: updated);
-    _persist();
-  }
-
   void addPrescription(Prescription prescription) {
-    final updated = [...state.prescriptions, prescription];
-    state = state.copyWith(prescriptions: updated);
-    _persist();
+  final updated = [...state.prescriptions, prescription];
+  state = state.copyWith(prescriptions: updated);
+  _persist();
+}
+
+void removePrescription(String prescriptionId) {
+  final updated =
+      state.prescriptions.where((item) => item.id != prescriptionId).toList();
+  state = state.copyWith(prescriptions: updated);
+  _persist();
+}
+
+void updatePrescription(Prescription prescription) {
+  final updated = state.prescriptions
+      .map((item) => item.id == prescription.id ? prescription : item)
+      .toList();
+  state = state.copyWith(prescriptions: updated);
+  _persist();
+}
+
+Map<String, int> _calculateStreaks(List<MoodEntry> entries) {
+  if (entries.isEmpty) return {'current': 0, 'longest': 0};
+
+  final days = entries
+      .map((e) =>
+          DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day))
+      .toSet()
+      .toList()
+    ..sort();
+
+  int currentStreak = 0;
+  int longestStreak = 0;
+  int tempStreak = 1;
+
+  for (int i = 1; i < days.length; i++) {
+    final diff = days[i].difference(days[i - 1]).inDays;
+    if (diff == 1) {
+      tempStreak++;
+    } else {
+      longestStreak = tempStreak > longestStreak ? tempStreak : longestStreak;
+      tempStreak = 1;
+    }
+  }
+  longestStreak = tempStreak > longestStreak ? tempStreak : longestStreak;
+
+  final today =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  final lastDay = days.last;
+
+  if (lastDay == today ||
+      lastDay == today.subtract(const Duration(days: 1))) {
+    currentStreak = 1;
+    for (int i = days.length - 2; i >= 0; i--) {
+      if (days[i + 1].difference(days[i]).inDays == 1) {
+        currentStreak++;
+      } else {
+        break;
+      }
+    }
   }
 
-  void removePrescription(String prescriptionId) {
-    final updated =
-        state.prescriptions.where((item) => item.id != prescriptionId).toList();
-    state = state.copyWith(prescriptions: updated);
-    _persist();
-  }
-
-  void updatePrescription(Prescription prescription) {
-    final updated = state.prescriptions
-        .map((item) => item.id == prescription.id ? prescription : item)
-        .toList();
-    state = state.copyWith(prescriptions: updated);
-    _persist();
-  }
+  return {'current': currentStreak, 'longest': longestStreak};
+}
 
   void updateProfile(AppProfile profile) {
     state = state.copyWith(profile: profile);
+    _persist();
+  }
+
+  void updateJournalSummary(String summary) {
+    state = state.copyWith(
+      journalSummary: summary,
+      journalUpdatedAt: DateTime.now(),
+    );
     _persist();
   }
 

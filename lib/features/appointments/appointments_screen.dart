@@ -184,10 +184,8 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                   child: SmoothCard(
                     borderRadius: 22,
                     elevation: 16,
-                    backgroundColor: Theme.of(context)
-                        .colorScheme
-                        .surface
-                        .withOpacity(0.72),
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surface.withOpacity(0.72),
                     borderColor: AppColors.neonViolet.withOpacity(0.2),
                     padding: const EdgeInsets.all(18),
                     child: Column(
@@ -211,8 +209,8 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                           children: demoPsychologists
                               .map(
                                 (psychologist) => ChoiceChip(
-                                  selected:
-                                      _emailController.text == psychologist.email,
+                                  selected: _emailController.text ==
+                                      psychologist.email,
                                   avatar: const Icon(
                                     Icons.psychology_alt_outlined,
                                     size: 18,
@@ -233,7 +231,8 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                           Text(
                             'Only one appointment can be active. Booking a new one replaces the current future appointment.',
                             style: AppTypography.bodySmall.copyWith(
-                              color: Theme.of(context).textTheme.bodySmall?.color,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall?.color,
                             ),
                           ),
                         ],
@@ -334,6 +333,35 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                   );
                 },
               ),
+              if (profile?.role == UserRole.patient) ...[
+                const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(18, 12, 18, 8),
+                    child: Text(
+                      'Your prescriptions',
+                      style: AppTypography.headingSmall,
+                    ),
+                  ),
+                ),
+                SliverList.builder(
+                  itemCount: session.prescriptions
+                      .where((prescription) =>
+                          prescription.patientEmail == profile?.email ||
+                          prescription.patientName == profile?.name)
+                      .length,
+                  itemBuilder: (context, index) {
+                    final prescription = session.prescriptions
+                        .where((prescription) =>
+                            prescription.patientEmail == profile?.email ||
+                            prescription.patientName == profile?.name)
+                        .toList()[index];
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(18, 0, 18, 12),
+                      child: _PrescriptionCard(prescription: prescription),
+                    );
+                  },
+                ),
+              ],
             ],
           ),
         ),
@@ -481,6 +509,56 @@ class _AppointmentCard extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PrescriptionCard extends StatelessWidget {
+  final Prescription prescription;
+
+  const _PrescriptionCard({required this.prescription});
+
+  @override
+  Widget build(BuildContext context) {
+    return SmoothCard(
+      borderRadius: 20,
+      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.72),
+      borderColor: AppColors.success.withOpacity(0.3),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Prescription from ${prescription.prescribedByName}',
+            style: AppTypography.labelLarge,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Patient: ${prescription.patientName}',
+            style: AppTypography.bodySmall,
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: prescription.medicines
+                .map((medicine) => Chip(label: Text(medicine)))
+                .toList(),
+          ),
+          if (prescription.note.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              prescription.note,
+              style: AppTypography.bodySmall,
+            ),
+          ],
+          const SizedBox(height: 8),
+          Text(
+            'Issued ${prescription.createdAt.day}/${prescription.createdAt.month}/${prescription.createdAt.year}',
+            style: AppTypography.caption,
           ),
         ],
       ),

@@ -219,23 +219,96 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleMedicationReminders(
-      List<Prescription> prescriptions) async {
+  /// Schedule all medication reminders from a list of medicines and times
+  /// This will schedule daily repeating reminders at the specified times
+  Future<void> scheduleMedicationReminders({
+    required List<String> medicines,
+    required List<({int hour, int minute})> times,
+  }) async {
+    // Cancel existing medication reminders first
     await cancelMedicationReminders();
-    for (var index = 0; index < prescriptions.length; index++) {
-      final prescription = prescriptions[index];
-      await scheduleMedicationReminder(
-        hour: prescription.hour,
-        minute: prescription.minute,
-        medicationName: prescription.medicationName,
-        id: 2000 + index,
+
+    if (medicines.isEmpty || times.isEmpty) return;
+
+    final medicineList = medicines.join(', ');
+
+    for (var i = 0; i < times.length; i++) {
+      final time = times[i];
+      await _scheduleDailyMedicationReminder(
+        hour: time.hour,
+        minute: time.minute,
+        medicationName: medicineList,
+        id: 2000 + i,
       );
     }
   }
 
+  /// Schedule a daily repeating medication reminder at a specific time
+  Future<void> _scheduleDailyMedicationReminder({
+    required int hour,
+    required int minute,
+    required String medicationName,
+    required int id,
+  }) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'calmora_medication',
+      'Medication Reminders',
+      channelDescription: 'Daily medication reminders',
+      importance: Importance.high,
+      priority: Priority.high,
+      enableVibration: true,
+    );
+
+    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
+
+    const NotificationDetails details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduledDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+
+    // If the time has already passed today, schedule for tomorrow
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+
+    try {
+      await _notificationsPlugin.zonedSchedule(
+        id,
+        '💊 Medication Reminder',
+        'Time to take: $medicationName',
+        scheduledDate,
+        details,
+        androidScheduleMode: AndroidScheduleMode.inexact,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    } catch (e) {
+      // Fallback for older versions
+      await _notificationsPlugin.show(
+        id,
+        '💊 Medication Reminder',
+        'Time to take: $medicationName',
+        details,
+      );
+    }
+  }
+
+  /// Cancel all medication reminders
   Future<void> cancelMedicationReminders() async {
-    for (var id = 2000; id < 2100; id++) {
-      await _notificationsPlugin.cancel(id);
+    for (var i = 0; i < 10; i++) {
+      await _notificationsPlugin.cancel(2000 + i);
     }
   }
 

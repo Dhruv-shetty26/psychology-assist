@@ -4,6 +4,7 @@ import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/mood_log/mood_log_screen.dart';
 import '../../features/psychologists/psychologists_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../../features/breathing_exercise/breathing_exercise_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -24,6 +25,11 @@ class AppRouter {
         return SmoothPageTransition(
           page: const PsychologistsScreen(),
           axisDirection: AxisDirection.right,
+        );
+      case '/breathing':
+        return SmoothPageTransition(
+          page: const BreathingExerciseScreen(),
+          axisDirection: AxisDirection.up,
         );
       default:
         return MaterialPageRoute(builder: (_) => const DashboardScreen());

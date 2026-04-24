@@ -2,6 +2,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tzdata;
 
+import '../../app/app_state.dart';
+
 /// Service for managing local notifications (mood check-ins, medication reminders)
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -160,6 +162,7 @@ class NotificationService {
     required int hour,
     required int minute,
     required String medicationName,
+    int id = 2000,
   }) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
@@ -195,7 +198,7 @@ class NotificationService {
 
     try {
       await _notificationsPlugin.zonedSchedule(
-        2000 + hour,
+        id,
         'Medication reminder',
         'Remember to take $medicationName as prescribed.',
         scheduledDate,
@@ -208,11 +211,31 @@ class NotificationService {
     } catch (e) {
       // Fallback for older versions
       await _notificationsPlugin.show(
-        2000 + hour,
+        id,
         'Medication reminder',
         'Remember to take $medicationName as prescribed.',
         details,
       );
+    }
+  }
+
+  Future<void> scheduleMedicationReminders(
+      List<Prescription> prescriptions) async {
+    await cancelMedicationReminders();
+    for (var index = 0; index < prescriptions.length; index++) {
+      final prescription = prescriptions[index];
+      await scheduleMedicationReminder(
+        hour: prescription.hour,
+        minute: prescription.minute,
+        medicationName: prescription.medicationName,
+        id: 2000 + index,
+      );
+    }
+  }
+
+  Future<void> cancelMedicationReminders() async {
+    for (var id = 2000; id < 2100; id++) {
+      await _notificationsPlugin.cancel(id);
     }
   }
 

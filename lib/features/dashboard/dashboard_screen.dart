@@ -10,6 +10,7 @@ import '../../core/widgets/gradient_background.dart';
 import '../../core/widgets/smooth_widgets.dart';
 import '../../core/widgets/animations.dart';
 import '../../core/widgets/wavy_surface.dart';
+import 'stats_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -41,7 +42,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final profile = ref.watch(appSessionProvider).profile;
+    final session = ref.watch(appSessionProvider);
+    final profile = session.profile;
+    final upcomingAppointment = session.appointments
+        .where((appointment) => appointment.startsAt.isAfter(DateTime.now()))
+        .toList()
+      ..sort((a, b) => a.startsAt.compareTo(b.startsAt));
+    final nextAppointment = upcomingAppointment.isEmpty
+        ? 'No upcoming sessions'
+        : '${upcomingAppointment.first.type} at ${upcomingAppointment.first.startsAt.hour.toString().padLeft(2, '0')}:${upcomingAppointment.first.startsAt.minute.toString().padLeft(2, '0')}';
+
+    final relatedPrescriptions = session.prescriptions.where((item) {
+      if (profile?.role == UserRole.psychologist) {
+        return item.doctorEmail == profile?.email;
+      }
+      return profile?.email != null &&
+          item.patientEmail.toLowerCase() == profile!.email!.toLowerCase();
+    }).toList()
+      ..sort((a, b) {
+        return a.hour.compareTo(b.hour) != 0
+            ? a.hour.compareTo(b.hour)
+            : a.minute.compareTo(b.minute);
+      });
+    final nextPrescription = relatedPrescriptions.isEmpty
+        ? 'No reminders set'
+        : '${relatedPrescriptions.first.medicationName} at ${relatedPrescriptions.first.hour.toString().padLeft(2, '0')}:${relatedPrescriptions.first.minute.toString().padLeft(2, '0')}';
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -88,9 +113,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       theme.colorScheme.tertiary,
                     ],
                   ),
-                  borderColor: theme.colorScheme.primary.withValues(alpha: 0.28),
+                  borderColor:
+                      theme.colorScheme.primary.withValues(alpha: 0.28),
                   waveColorA: Colors.white.withValues(alpha: 0.16),
-                  waveColorB: theme.colorScheme.secondary.withValues(alpha: 0.18),
+                  waveColorB:
+                      theme.colorScheme.secondary.withValues(alpha: 0.18),
                   child: Row(
                     children: [
                       Padding(
@@ -138,10 +165,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                   ),
                 ),
                 const SizedBox(height: 16),
+                SmoothCard(
+                  backgroundColor: theme.colorScheme.surface.withOpacity(0.82),
+                  borderColor: AppColors.neonCyan.withOpacity(0.16),
+                  borderRadius: 22,
+                  elevation: 12,
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _DashboardStat(
+                          label: 'Next session',
+                          value: nextAppointment,
+                          icon: Icons.event_available_outlined,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _DashboardStat(
+                          label: 'Next reminder',
+                          value: nextPrescription,
+                          icon: Icons.medication,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
                 // Weekly Mood Trend Card
                 SmoothCard(
-                  backgroundColor:
-                      theme.colorScheme.surface.withOpacity(0.72),
+                  backgroundColor: theme.colorScheme.surface.withOpacity(0.72),
                   borderColor: AppColors.neonViolet.withOpacity(0.18),
                   elevation: 14,
                   borderRadius: 22,
@@ -208,8 +261,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
                 // Quick Insights Card
                 SmoothCard(
-                  backgroundColor:
-                      theme.colorScheme.surface.withOpacity(0.72),
+                  backgroundColor: theme.colorScheme.surface.withOpacity(0.72),
                   borderColor: AppColors.neonCyan.withOpacity(0.24),
                   borderRadius: 22,
                   padding: const EdgeInsets.all(20),
@@ -259,6 +311,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     backgroundColor: theme.colorScheme.primary,
                     textColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => const StatsScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('View full stats'),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -400,6 +466,57 @@ class _InsightRow extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _DashboardStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _DashboardStat({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        color: theme.colorScheme.surface.withOpacity(0.92),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: theme.colorScheme.primary, size: 18),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: AppTypography.bodySmall.copyWith(
+                    color: theme.textTheme.bodySmall?.color,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            style: AppTypography.labelLarge.copyWith(
+              color: theme.textTheme.titleMedium?.color,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

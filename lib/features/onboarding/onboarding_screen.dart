@@ -29,7 +29,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     super.initState();
     _role = UserRole.patient;
     _psychologistEmailController.text = demoPsychologistEmail;
-    _emailController.text = demoPsychologistEmail;
   }
 
   @override
@@ -71,8 +70,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       role: _role!,
       name: _nameController.text.trim(),
       dateOfBirth: _role == UserRole.patient ? _dateOfBirth : null,
-      email:
-          _role == UserRole.psychologist ? _emailController.text.trim() : null,
+      email: _emailController.text.trim(),
       psychologistEmail: _role == UserRole.patient &&
               _hasRegisteredPsychologist &&
               _psychologistEmailController.text.trim().isNotEmpty
@@ -176,6 +174,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                             },
                           ),
                           if (_role == UserRole.patient) ...[
+                            const SizedBox(height: 16),
+                            SmoothTextField(
+                              label: 'Your email',
+                              hint: 'you@example.com',
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                final text = value?.trim() ?? '';
+                                if (!text.contains('@')) {
+                                  return 'Enter a valid email';
+                                }
+                                return null;
+                              },
+                            ),
                             const SizedBox(height: 16),
                             _DateField(
                               date: _dateOfBirth,

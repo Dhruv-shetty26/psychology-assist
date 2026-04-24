@@ -110,6 +110,46 @@ class MoodEntry {
   });
 }
 
+class Prescription {
+  final String id;
+  final String medicationName;
+  final String doctorEmail;
+  final String patientEmail;
+  final String instructions;
+  final int hour;
+  final int minute;
+
+  const Prescription({
+    required this.id,
+    required this.medicationName,
+    required this.doctorEmail,
+    required this.patientEmail,
+    this.instructions = '',
+    required this.hour,
+    required this.minute,
+  });
+
+  Prescription copyWith({
+    String? id,
+    String? medicationName,
+    String? doctorEmail,
+    String? patientEmail,
+    String? instructions,
+    int? hour,
+    int? minute,
+  }) {
+    return Prescription(
+      id: id ?? this.id,
+      medicationName: medicationName ?? this.medicationName,
+      doctorEmail: doctorEmail ?? this.doctorEmail,
+      patientEmail: patientEmail ?? this.patientEmail,
+      instructions: instructions ?? this.instructions,
+      hour: hour ?? this.hour,
+      minute: minute ?? this.minute,
+    );
+  }
+}
+
 class AppPsychologist {
   final String name;
   final String email;
@@ -154,6 +194,7 @@ class AppSession {
   final AppProfile? profile;
   final List<Appointment> appointments;
   final List<MoodEntry> moodEntries;
+  final List<Prescription> prescriptions;
   final bool isLocked;
   final DateTime? lastUnlockedAt;
   final int lockTimeoutMinutes;
@@ -165,6 +206,7 @@ class AppSession {
     this.profile,
     this.appointments = const [],
     this.moodEntries = const [],
+    this.prescriptions = const [],
     this.isLocked = false,
     this.lastUnlockedAt,
     this.lockTimeoutMinutes = 10,
@@ -177,6 +219,7 @@ class AppSession {
     AppProfile? profile,
     List<Appointment>? appointments,
     List<MoodEntry>? moodEntries,
+    List<Prescription>? prescriptions,
     bool? isLocked,
     DateTime? lastUnlockedAt,
     int? lockTimeoutMinutes,
@@ -188,6 +231,7 @@ class AppSession {
       profile: profile ?? this.profile,
       appointments: appointments ?? this.appointments,
       moodEntries: moodEntries ?? this.moodEntries,
+      prescriptions: prescriptions ?? this.prescriptions,
       isLocked: isLocked ?? this.isLocked,
       lastUnlockedAt: lastUnlockedAt ?? this.lastUnlockedAt,
       lockTimeoutMinutes: lockTimeoutMinutes ?? this.lockTimeoutMinutes,
@@ -245,9 +289,10 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
 
   void approveAppointment(Appointment appointment) {
     final updated = state.appointments
-        .map((item) => identical(item, appointment) || _sameAppointment(item, appointment)
-            ? item.copyWith(confirmed: true)
-            : item)
+        .map((item) =>
+            identical(item, appointment) || _sameAppointment(item, appointment)
+                ? item.copyWith(confirmed: true)
+                : item)
         .toList();
     state = state.copyWith(appointments: updated);
     _persist();
@@ -265,6 +310,27 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
     final updated = [...state.moodEntries, entry]
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     state = state.copyWith(moodEntries: updated);
+    _persist();
+  }
+
+  void addPrescription(Prescription prescription) {
+    final updated = [...state.prescriptions, prescription];
+    state = state.copyWith(prescriptions: updated);
+    _persist();
+  }
+
+  void removePrescription(String prescriptionId) {
+    final updated =
+        state.prescriptions.where((item) => item.id != prescriptionId).toList();
+    state = state.copyWith(prescriptions: updated);
+    _persist();
+  }
+
+  void updatePrescription(Prescription prescription) {
+    final updated = state.prescriptions
+        .map((item) => item.id == prescription.id ? prescription : item)
+        .toList();
+    state = state.copyWith(prescriptions: updated);
     _persist();
   }
 

@@ -246,6 +246,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             ref
                                 .read(userPreferencesProvider.notifier)
                                 .updateMedicationRemindersEnabled(value);
+                            if (value) {
+                              _scheduleMedicationReminders();
+                            } else {
+                              NotificationService().cancelMedicationReminders();
+                            }
                           },
                           enabled: preferences.notificationsEnabled,
                         ),
@@ -253,9 +258,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         Divider(height: 1, color: theme.dividerColor),
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.notifications_active_outlined),
+                          leading:
+                              const Icon(Icons.notifications_active_outlined),
                           title: const Text('Alert center'),
-                          subtitle: const Text('Test and schedule Calmora alerts'),
+                          subtitle:
+                              const Text('Test and schedule Calmora alerts'),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () {
                             Navigator.of(context).push(
@@ -474,6 +481,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
 
   Future<void> _scheduleMoodCheckIns(int hours) async {
     await NotificationService().scheduleMoodCheckInsEvery(hours);
+  }
+
+  Future<void> _scheduleMedicationReminders() async {
+    final prescriptions = ref.read(appSessionProvider).prescriptions;
+    if (prescriptions.isNotEmpty) {
+      await NotificationService().scheduleMedicationReminders(prescriptions);
+    }
   }
 
   void _editProfile(AppProfile profile) {

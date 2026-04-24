@@ -19,7 +19,6 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
   int? _selectedMoodIndex;
   final _journalController = TextEditingController();
   late AnimationController _animationController;
-  bool _isSubmitted = false;
 
   final List<_MoodOption> _moods = [
     _MoodOption(
@@ -92,23 +91,24 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
           ),
         );
 
-    setState(() => _isSubmitted = true);
+    setState(() {
+      _selectedMoodIndex = null;
+      _journalController.clear();
+    });
+
     AppSnackBar.showSuccess(
       context,
       title: 'Mood saved',
-      message: 'Your check-in is safely stored.',
+      message: 'Your entry is saved to your journal.',
       duration: const Duration(milliseconds: 1400),
     );
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        ref.read(selectedTabProvider.notifier).state = 0;
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final session = ref.watch(appSessionProvider);
+    final entries = session.moodEntries.reversed.toList();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -127,10 +127,8 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
           child: Column(
             children: [
               const SizedBox(height: 16),
-
-              // Date header
               Text(
-                'How are you feeling today?',
+                'Journal & Mood Notes',
                 style: AppTypography.displayMedium.copyWith(
                   color: theme.textTheme.displayMedium?.color,
                 ),
@@ -138,22 +136,28 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                'Your response helps us understand your wellness journey.',
+                'Capture your mood, thoughts, and calm reflections in one place.',
                 style: AppTypography.bodySmall.copyWith(
                   color: theme.textTheme.bodySmall?.color,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 32),
-
-              // Mood Selection Grid
+              const SizedBox(height: 24),
               SmoothCard(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(20),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Text(
+                      'Select your feeling',
+                      style: AppTypography.labelLarge.copyWith(
+                        color: theme.textTheme.labelLarge?.color,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
                     Wrap(
-                      spacing: 16,
-                      runSpacing: 16,
+                      spacing: 12,
+                      runSpacing: 12,
                       alignment: WrapAlignment.center,
                       children: List.generate(
                         _moods.length,
@@ -168,38 +172,32 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
                     if (_selectedMoodIndex != null)
-                      AnimatedOpacity(
-                        opacity: 1.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: Text(
-                          'Feeling ${_moods[_selectedMoodIndex!].label.toLowerCase()}',
-                          style: AppTypography.labelLarge.copyWith(
-                            color: theme.colorScheme.primary,
-                          ),
+                      Text(
+                        'Feeling ${_moods[_selectedMoodIndex!].label.toLowerCase()}',
+                        style: AppTypography.labelLarge.copyWith(
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Journal Section
               SmoothCard(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Add a Note (Optional)',
+                      'Add a Note',
                       style: AppTypography.headingSmall.copyWith(
                         color: theme.textTheme.titleMedium?.color,
                       ),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'What\'s on your mind? Keep it brief and honest.',
+                      'Capture a quick thought, reflection, or detail from your day.',
                       style: AppTypography.bodySmall.copyWith(
                         color: theme.textTheme.bodySmall?.color,
                       ),
@@ -207,12 +205,12 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
                     const SizedBox(height: 16),
                     TextField(
                       controller: _journalController,
-                      maxLines: 4,
-                      enabled: !_isSubmitted,
+                      minLines: 6,
+                      maxLines: null,
                       decoration: InputDecoration(
-                        hintText: 'Write your thoughts here...',
+                        hintText: 'Write freely — this is your private space.',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                         ),
                         filled: true,
                         fillColor: theme.colorScheme.surface,
@@ -221,9 +219,9 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
                         color: theme.textTheme.bodyMedium?.color,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Text(
-                      'Your entries are private and never shared.',
+                      'Your entries are private and stored locally on this device.',
                       style: AppTypography.captionSmall.copyWith(
                         color: theme.textTheme.bodySmall?.color,
                         fontStyle: FontStyle.italic,
@@ -232,62 +230,83 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
                   ],
                 ),
               ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: SmoothButton(
+                  onPressed: _submitMood,
+                  label: 'Save Mood Entry',
+                  backgroundColor: theme.colorScheme.primary,
+                  textColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+              ),
               const SizedBox(height: 24),
-
-              // Action Buttons
-              if (!_isSubmitted)
+              if (entries.isNotEmpty)
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: SmoothButton(
-                        onPressed: _submitMood,
-                        label: 'Save Mood Entry',
-                        backgroundColor: theme.colorScheme.primary,
-                        textColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        isLoading: _isSubmitted,
+                    Text(
+                      'Recent journal entries',
+                      style: AppTypography.headingSmall.copyWith(
+                        color: theme.textTheme.titleMedium?.color,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: SmoothButton(
-                        onPressed: () {
-                          ref.read(selectedTabProvider.notifier).state = 0;
-                        },
-                        label: 'Cancel',
-                        isOutlined: true,
-                        backgroundColor: theme.colorScheme.primary,
-                        textColor: theme.colorScheme.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
+                    const SizedBox(height: 16),
+                    ...entries.take(5).map(
+                          (entry) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: SmoothCard(
+                              borderRadius: 18,
+                              padding: const EdgeInsets.all(16),
+                              backgroundColor:
+                                  theme.colorScheme.surface.withOpacity(0.8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        entry.label,
+                                        style: AppTypography.labelLarge,
+                                      ),
+                                      Text(
+                                        '${entry.createdAt.day}/${entry.createdAt.month} ${entry.createdAt.hour.toString().padLeft(2, '0')}:${entry.createdAt.minute.toString().padLeft(2, '0')}',
+                                        style: AppTypography.bodySmall.copyWith(
+                                          color:
+                                              theme.textTheme.bodySmall?.color,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    entry.note.isEmpty
+                                        ? 'No additional note provided.'
+                                        : entry.note,
+                                    style: AppTypography.bodyMedium.copyWith(
+                                      color: theme.textTheme.bodyMedium?.color,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                   ],
                 )
               else
                 SmoothCard(
-                  padding: const EdgeInsets.all(20),
-                  backgroundColor: theme.colorScheme.primary.withOpacity(0.05),
-                  borderColor: theme.colorScheme.primary.withOpacity(0.2),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: theme.colorScheme.primary,
-                        size: 28,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Mood saved successfully!',
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
+                  borderRadius: 18,
+                  padding: const EdgeInsets.all(18),
+                  backgroundColor: theme.colorScheme.surface.withOpacity(0.72),
+                  child: Text(
+                    'No journal entries yet. Save a mood entry to start building your notes.',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: theme.textTheme.bodySmall?.color,
+                    ),
                   ),
                 ),
               const SizedBox(height: 32),

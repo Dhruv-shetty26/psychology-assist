@@ -9,6 +9,8 @@ export 'theme/app_theme.dart';
 export 'widgets/smooth_widgets.dart';
 export 'widgets/animations.dart';
 export 'widgets/gradient_background.dart';
+export 'widgets/app_snackbar.dart';
+export 'widgets/wavy_surface.dart';
 
 // Services
 export 'services/notification_service.dart';

@@ -9,6 +9,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/widgets/gradient_background.dart';
 import '../../core/widgets/smooth_widgets.dart';
 import '../../core/widgets/animations.dart';
+import '../../core/widgets/wavy_surface.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -77,51 +78,57 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               duration: const Duration(milliseconds: 600),
               delay: const Duration(milliseconds: 80),
               children: [
-                Container(
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
-                    gradient: const LinearGradient(
-                      colors: [AppColors.deepViolet, AppColors.neonViolet],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.neonViolet.withOpacity(0.35),
-                        blurRadius: 28,
-                        offset: const Offset(0, 14),
-                      ),
+                WavySurface(
+                  borderRadius: BorderRadius.circular(28),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.tertiary,
                     ],
                   ),
+                  borderColor: theme.colorScheme.primary.withValues(alpha: 0.28),
+                  waveColorA: Colors.white.withValues(alpha: 0.16),
+                  waveColorB: theme.colorScheme.secondary.withValues(alpha: 0.18),
                   child: Row(
                     children: [
-                      Container(
-                        width: 52,
-                        height: 52,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.18),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.auto_awesome,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Padding(
+                        padding: const EdgeInsets.all(22),
+                        child: Row(
                           children: [
-                            Text(
-                              'Hi ${profile?.name ?? 'there'}',
-                              style: AppTypography.headingLarge.copyWith(
-                                color: Colors.white,
+                            Container(
+                              width: 52,
+                              height: 52,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.18),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.auto_awesome,
+                                color: theme.colorScheme.onPrimary,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Your private, glowing little care space is ready.',
-                              style: AppTypography.bodySmall.copyWith(
-                                color: Colors.white.withOpacity(0.84),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Hi ${profile?.name ?? 'there'}',
+                                    style: AppTypography.headingLarge.copyWith(
+                                      color: theme.colorScheme.onPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Your private, glowing little care space is ready.',
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: theme.colorScheme.onPrimary
+                                          .withValues(alpha: 0.84),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],

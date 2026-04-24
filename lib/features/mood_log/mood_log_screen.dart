@@ -4,6 +4,7 @@ import '../../app/app_state.dart';
 import '../../app/home_screen.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/smooth_widgets.dart';
 
 class MoodLogScreen extends ConsumerStatefulWidget {
@@ -72,12 +73,11 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
 
   void _submitMood() {
     if (_selectedMoodIndex == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please select a mood to continue'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-          duration: const Duration(milliseconds: 2000),
-        ),
+      AppSnackBar.showError(
+        context,
+        title: 'Pick a mood',
+        message: 'Please select a mood to continue.',
+        duration: const Duration(milliseconds: 2000),
       );
       return;
     }
@@ -93,12 +93,11 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
         );
 
     setState(() => _isSubmitted = true);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Mood saved'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        duration: const Duration(milliseconds: 1200),
-      ),
+    AppSnackBar.showSuccess(
+      context,
+      title: 'Mood saved',
+      message: 'Your check-in is safely stored.',
+      duration: const Duration(milliseconds: 1400),
     );
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {

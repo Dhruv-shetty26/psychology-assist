@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/gradient_background.dart';
 import '../../core/widgets/smooth_widgets.dart';
 
@@ -116,7 +117,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
       _selectedDate = null;
       _selectedTime = null;
     });
-    _showMessage('Appointment request sent.');
+    _showMessage('Appointment request sent.', success: true);
   }
 
   Future<bool> _confirmAppointment(
@@ -150,9 +151,12 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
         false;
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+  void _showMessage(String message, {bool success = false}) {
+    if (success) {
+      AppSnackBar.showSuccess(context, message: message);
+    } else {
+      AppSnackBar.showInfo(context, message: message);
+    }
   }
 
   @override

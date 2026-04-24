@@ -1,446 +1,296 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
-import 'app_typography.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-/// Comprehensive theme data for light, dark, and medical themes
 class AppThemes {
-  // Light Theme
-  static ThemeData lightTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.light,
-    colorScheme: const ColorScheme.light(
-      primary: AppColors.lightPrimary,
-      secondary: AppColors.lightSecondary,
-      tertiary: AppColors.lightAccent,
-      surface: AppColors.lightSurface,
-      error: AppColors.error,
-      onPrimary: AppColors.lightBg,
-      onSecondary: Colors.white,
-      onSurface: AppColors.lightText,
-    ),
-    scaffoldBackgroundColor: AppColors.lightBg,
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.lightBg,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: AppTypography.headingMedium.copyWith(
-        color: AppColors.lightText,
-      ),
-      iconTheme: const IconThemeData(color: AppColors.lightText),
-    ),
-    cardTheme: CardTheme(
-      color: AppColors.lightSurface,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.lightBorder, width: 0.5),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.lightPrimary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        backgroundColor: AppColors.lightPrimary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.lightPrimary,
-        side: const BorderSide(color: AppColors.lightBorder),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: AppColors.lightDivider,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.lightBorder, width: 0.5),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.lightPrimary, width: 2),
-      ),
-      hintStyle: AppTypography.bodyMedium.copyWith(
-        color: AppColors.lightSubtext,
-      ),
-      labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.lightText),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    ),
-    textTheme: TextTheme(
-      displayLarge: AppTypography.displayLarge.copyWith(
-        color: AppColors.lightText,
-      ),
-      displayMedium: AppTypography.displayMedium.copyWith(
-        color: AppColors.lightText,
-      ),
-      headlineSmall: AppTypography.headingSmall.copyWith(
-        color: AppColors.lightText,
-      ),
-      titleLarge: AppTypography.headingLarge.copyWith(
-        color: AppColors.lightText,
-      ),
-      titleMedium: AppTypography.headingMedium.copyWith(
-        color: AppColors.lightText,
-      ),
-      titleSmall: AppTypography.headingSmall.copyWith(
-        color: AppColors.lightText,
-      ),
-      bodyLarge: AppTypography.bodyLarge.copyWith(color: AppColors.lightText),
-      bodyMedium: AppTypography.bodyMedium.copyWith(color: AppColors.lightText),
-      bodySmall: AppTypography.bodySmall.copyWith(
-        color: AppColors.lightSubtext,
-      ),
-      labelLarge: AppTypography.labelLarge.copyWith(color: AppColors.lightText),
-      labelMedium: AppTypography.labelMedium.copyWith(
-        color: AppColors.lightSubtext,
-      ),
-    ),
-    dividerTheme: const DividerThemeData(
-      color: AppColors.lightBorder,
-      thickness: 0.5,
-      space: 0,
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.lightPrimary,
-      foregroundColor: Colors.white,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    ),
-    extensions: <ThemeExtension<dynamic>>[_CustomThemeExtension.light()],
-  );
+  const AppThemes._();
 
-  // Dark Theme
-  static ThemeData darkTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    colorScheme: const ColorScheme.dark(
-      primary: AppColors.darkPrimary,
-      secondary: AppColors.darkSecondary,
-      tertiary: AppColors.darkAccent,
-      surface: AppColors.darkSurface,
-      background: AppColors.darkBg,
-      error: AppColors.error,
-      onPrimary: AppColors.darkBg,
-      onSecondary: AppColors.darkBg,
-      onSurface: AppColors.darkText,
-    ),
-    scaffoldBackgroundColor: AppColors.darkBg,
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.darkSurface,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: AppTypography.headingMedium.copyWith(
-        color: AppColors.darkText,
-      ),
-      iconTheme: const IconThemeData(color: AppColors.darkText),
-    ),
-    cardTheme: CardTheme(
-      color: AppColors.darkSurface,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.darkBorder, width: 0.5),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.darkPrimary,
-        foregroundColor: AppColors.darkBg,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        backgroundColor: AppColors.darkPrimary,
-        foregroundColor: AppColors.darkBg,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.darkPrimary,
-        side: const BorderSide(color: AppColors.darkBorder),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: AppColors.darkDivider,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.darkBorder, width: 0.5),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.darkPrimary, width: 2),
-      ),
-      hintStyle: AppTypography.bodyMedium.copyWith(
-        color: AppColors.darkSubtext,
-      ),
-      labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.darkText),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    ),
-    textTheme: TextTheme(
-      displayLarge: AppTypography.displayLarge.copyWith(
-        color: AppColors.darkText,
-      ),
-      displayMedium: AppTypography.displayMedium.copyWith(
-        color: AppColors.darkText,
-      ),
-      headlineSmall: AppTypography.headingSmall.copyWith(
-        color: AppColors.darkText,
-      ),
-      titleLarge: AppTypography.headingLarge.copyWith(
-        color: AppColors.darkText,
-      ),
-      titleMedium: AppTypography.headingMedium.copyWith(
-        color: AppColors.darkText,
-      ),
-      titleSmall: AppTypography.headingSmall.copyWith(
-        color: AppColors.darkText,
-      ),
-      bodyLarge: AppTypography.bodyLarge.copyWith(color: AppColors.darkText),
-      bodyMedium: AppTypography.bodyMedium.copyWith(color: AppColors.darkText),
-      bodySmall: AppTypography.bodySmall.copyWith(color: AppColors.darkSubtext),
-      labelLarge: AppTypography.labelLarge.copyWith(color: AppColors.darkText),
-      labelMedium: AppTypography.labelMedium.copyWith(
-        color: AppColors.darkSubtext,
-      ),
-    ),
-    dividerTheme: const DividerThemeData(
-      color: AppColors.darkBorder,
-      thickness: 0.5,
-      space: 0,
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.darkPrimary,
-      foregroundColor: AppColors.darkBg,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    ),
-    extensions: <ThemeExtension<dynamic>>[_CustomThemeExtension.dark()],
-  );
-
-  // Medical Theme (clean, clinical, healthcare-focused)
-  static ThemeData medicalTheme = ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.light,
-    colorScheme: const ColorScheme.light(
-      primary: AppColors.medicalPrimary,
-      secondary: AppColors.medicalSecondary,
-      tertiary: AppColors.medicalAccent,
-      surface: AppColors.medicalSurface,
-      background: AppColors.medicalBg,
-      error: AppColors.error,
-      onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: AppColors.medicalText,
-    ),
-    scaffoldBackgroundColor: AppColors.medicalBg,
-    appBarTheme: AppBarTheme(
-      backgroundColor: AppColors.medicalSurface,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: AppTypography.headingMedium.copyWith(
-        color: AppColors.medicalText,
-      ),
-      iconTheme: const IconThemeData(color: AppColors.medicalText),
-    ),
-    cardTheme: CardTheme(
-      color: AppColors.medicalSurface,
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.medicalBorder, width: 0.5),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.medicalPrimary,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        backgroundColor: AppColors.medicalPrimary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.medicalPrimary,
-        side: const BorderSide(color: AppColors.medicalBorder),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        textStyle: AppTypography.labelLarge,
-      ),
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: AppColors.medicalDivider,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(
-          color: AppColors.medicalBorder,
-          width: 0.5,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.medicalPrimary, width: 2),
-      ),
-      hintStyle: AppTypography.bodyMedium.copyWith(
-        color: AppColors.medicalSubtext,
-      ),
-      labelStyle: AppTypography.bodyMedium.copyWith(
-        color: AppColors.medicalText,
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    ),
-    textTheme: TextTheme(
-      displayLarge: AppTypography.displayLarge.copyWith(
-        color: AppColors.medicalText,
-      ),
-      displayMedium: AppTypography.displayMedium.copyWith(
-        color: AppColors.medicalText,
-      ),
-      headlineSmall: AppTypography.headingSmall.copyWith(
-        color: AppColors.medicalText,
-      ),
-      titleLarge: AppTypography.headingLarge.copyWith(
-        color: AppColors.medicalText,
-      ),
-      titleMedium: AppTypography.headingMedium.copyWith(
-        color: AppColors.medicalText,
-      ),
-      titleSmall: AppTypography.headingSmall.copyWith(
-        color: AppColors.medicalText,
-      ),
-      bodyLarge: AppTypography.bodyLarge.copyWith(color: AppColors.medicalText),
-      bodyMedium: AppTypography.bodyMedium.copyWith(
-        color: AppColors.medicalText,
-      ),
-      bodySmall: AppTypography.bodySmall.copyWith(
-        color: AppColors.medicalSubtext,
-      ),
-      labelLarge: AppTypography.labelLarge.copyWith(
-        color: AppColors.medicalText,
-      ),
-      labelMedium: AppTypography.labelMedium.copyWith(
-        color: AppColors.medicalSubtext,
-      ),
-    ),
-    dividerTheme: const DividerThemeData(
-      color: AppColors.medicalBorder,
-      thickness: 0.5,
-      space: 0,
-    ),
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: AppColors.medicalPrimary,
-      foregroundColor: Colors.white,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    ),
-    extensions: <ThemeExtension<dynamic>>[_CustomThemeExtension.medical()],
-  );
+  static ThemeData get lightTheme => AppTheme.light();
+  static ThemeData get darkTheme => AppTheme.dark();
+  static ThemeData get medicalTheme => AppTheme.light();
 }
 
-/// Custom theme extension for additional theme properties
-class _CustomThemeExtension extends ThemeExtension<_CustomThemeExtension> {
-  final Color cardBorder;
-  final Color shadowColor;
-  final double cardRadius;
+class AppTheme {
+  const AppTheme._();
 
-  _CustomThemeExtension({
-    required this.cardBorder,
-    required this.shadowColor,
-    required this.cardRadius,
-  });
+  static const _pageTransitions = PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+      TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+    },
+  );
 
-  factory _CustomThemeExtension.light() => _CustomThemeExtension(
-        cardBorder: AppColors.lightBorder,
-        shadowColor: const Color(0x1A000000),
-        cardRadius: 16,
-      );
+  static const darkBackground = Color(0xFF090D14);
+  static const lightBackground = Color(0xFFF4F7FB);
 
-  factory _CustomThemeExtension.dark() => _CustomThemeExtension(
-        cardBorder: AppColors.darkBorder,
-        shadowColor: const Color(0x4D000000),
-        cardRadius: 16,
-      );
+  static const darkScheme = ColorScheme.dark(
+    primary: Color(0xFF65E0C2),
+    secondary: Color(0xFFFFC26F),
+    tertiary: Color(0xFF7E9DFF),
+    surface: Color(0xFF111927),
+    error: Color(0xFFFF6D7A),
+    onPrimary: Color(0xFF04110D),
+    onSecondary: Color(0xFF1C1200),
+    onSurface: Color(0xFFE8ECF5),
+    onError: Color(0xFF2D0208),
+  );
 
-  factory _CustomThemeExtension.medical() => _CustomThemeExtension(
-        cardBorder: AppColors.medicalBorder,
-        shadowColor: const Color(0x1A000000),
-        cardRadius: 16,
-      );
+  static const lightScheme = ColorScheme.light(
+    primary: Color(0xFF0FA58A),
+    secondary: Color(0xFFE08A00),
+    tertiary: Color(0xFF4A6CF7),
+    surface: Color(0xFFFFFFFF),
+    error: Color(0xFFB3261E),
+    onPrimary: Color(0xFFFFFFFF),
+    onSecondary: Color(0xFFFFFFFF),
+    onSurface: Color(0xFF1A2433),
+    onError: Color(0xFFFFFFFF),
+  );
 
-  @override
-  ThemeExtension<_CustomThemeExtension> copyWith({
-    Color? cardBorder,
-    Color? shadowColor,
-    double? cardRadius,
+  static const birthdayPrimary = Color(0xFFFF8A3D);
+  static const birthdaySecondary = Color(0xFFFFC857);
+  static const birthdayTertiary = Color(0xFFFF6FCF);
+
+  static ThemeData dark() {
+    return _build(
+      brightness: Brightness.dark,
+      scheme: darkScheme,
+      scaffoldBackground: darkBackground,
+      baseTextTheme: ThemeData.dark().textTheme,
+      inputFill: darkScheme.surface.withValues(alpha: 0.95),
+      hintAlpha: 0.50,
+      labelAlpha: 0.75,
+      borderAlpha: 0.12,
+      focusedBorderAlpha: 0.70,
+      cardBorderAlpha: 0.10,
+      chipBackground: darkScheme.surface.withValues(alpha: 0.90),
+      chipSelectedAlpha: 0.20,
+      chipDisabled: darkScheme.surface.withValues(alpha: 0.50),
+      outlinedBorderAlpha: 0.20,
+    );
+  }
+
+  static ThemeData light() {
+    return _build(
+      brightness: Brightness.light,
+      scheme: lightScheme,
+      scaffoldBackground: lightBackground,
+      baseTextTheme: ThemeData.light().textTheme,
+      inputFill: lightScheme.surface,
+      hintAlpha: 0.45,
+      labelAlpha: 0.72,
+      borderAlpha: 0.15,
+      focusedBorderAlpha: 0.80,
+      cardBorderAlpha: 0.14,
+      chipBackground: lightScheme.surface,
+      chipSelectedAlpha: 0.16,
+      chipDisabled: lightScheme.onSurface.withValues(alpha: 0.05),
+      outlinedBorderAlpha: 0.24,
+    );
+  }
+
+  static ThemeData birthday(BuildContext context) {
+    final base = Theme.of(context);
+    final birthdayScheme = base.colorScheme.copyWith(
+      primary: birthdayPrimary,
+      secondary: birthdaySecondary,
+      tertiary: birthdayTertiary,
+    );
+    return base.copyWith(
+      colorScheme: birthdayScheme,
+      appBarTheme: base.appBarTheme.copyWith(
+        backgroundColor: birthdayScheme.surface,
+        foregroundColor: birthdayScheme.onSurface,
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: birthdayScheme.primary,
+          foregroundColor: birthdayScheme.onPrimary,
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+      bottomNavigationBarTheme: base.bottomNavigationBarTheme.copyWith(
+        selectedItemColor: birthdayScheme.primary,
+      ),
+    );
+  }
+
+  static ThemeData _build({
+    required Brightness brightness,
+    required ColorScheme scheme,
+    required Color scaffoldBackground,
+    required TextTheme baseTextTheme,
+    required Color inputFill,
+    required double hintAlpha,
+    required double labelAlpha,
+    required double borderAlpha,
+    required double focusedBorderAlpha,
+    required double cardBorderAlpha,
+    required Color chipBackground,
+    required double chipSelectedAlpha,
+    required Color chipDisabled,
+    required double outlinedBorderAlpha,
   }) {
-    return _CustomThemeExtension(
-      cardBorder: cardBorder ?? this.cardBorder,
-      shadowColor: shadowColor ?? this.shadowColor,
-      cardRadius: cardRadius ?? this.cardRadius,
+    final baseText = GoogleFonts.plusJakartaSansTextTheme(
+      baseTextTheme,
+    ).apply(bodyColor: scheme.onSurface, displayColor: scheme.onSurface);
+    final textTheme = GoogleFonts.spaceGroteskTextTheme(baseText).copyWith(
+      titleLarge: GoogleFonts.spaceGrotesk(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: scheme.onSurface,
+      ),
+      titleMedium: GoogleFonts.spaceGrotesk(
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        color: scheme.onSurface,
+      ),
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: scaffoldBackground,
+      textTheme: textTheme,
+      appBarTheme: AppBarTheme(
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: textTheme.titleLarge,
+      ),
+      cardTheme: CardThemeData(
+        color: scheme.surface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: scheme.primary.withValues(alpha: cardBorderAlpha),
+          ),
+        ),
+      ),
+      dividerTheme: DividerThemeData(
+        color: scheme.onSurface.withValues(alpha: 0.12),
+        thickness: 1,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: inputFill,
+        hintStyle: TextStyle(
+          color: scheme.onSurface.withValues(alpha: hintAlpha),
+          fontWeight: FontWeight.w500,
+        ),
+        labelStyle: TextStyle(
+          color: scheme.onSurface.withValues(alpha: labelAlpha),
+          fontWeight: FontWeight.w600,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: _inputBorder(scheme, borderAlpha),
+        enabledBorder: _inputBorder(scheme, borderAlpha),
+        focusedBorder: _inputBorder(scheme, focusedBorderAlpha, focused: true),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: chipBackground,
+        selectedColor: scheme.primary.withValues(alpha: chipSelectedAlpha),
+        disabledColor: chipDisabled,
+        side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.15)),
+        labelStyle: TextStyle(color: scheme.onSurface),
+        secondaryLabelStyle: TextStyle(color: scheme.onSurface),
+        brightness: brightness,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          elevation: 0,
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: scheme.onSurface,
+          side: BorderSide(
+            color: scheme.onSurface.withValues(alpha: outlinedBorderAlpha),
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: scheme.surface,
+        elevation: 0,
+        insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+        contentTextStyle: TextStyle(color: scheme.onSurface),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: scheme.surface,
+        selectedItemColor: scheme.primary,
+        unselectedItemColor: scheme.onSurface.withValues(alpha: 0.6),
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+        type: BottomNavigationBarType.fixed,
+      ),
+      pageTransitionsTheme: _pageTransitions,
     );
   }
 
-  @override
-  ThemeExtension<_CustomThemeExtension> lerp(
-    ThemeExtension<_CustomThemeExtension>? other,
-    double t,
-  ) {
-    if (other is! _CustomThemeExtension) {
-      return this;
-    }
-    return _CustomThemeExtension(
-      cardBorder: Color.lerp(cardBorder, other.cardBorder, t) ?? cardBorder,
-      shadowColor: Color.lerp(shadowColor, other.shadowColor, t) ?? shadowColor,
-      cardRadius: cardRadius + (other.cardRadius - cardRadius) * t,
+  static OutlineInputBorder _inputBorder(
+    ColorScheme scheme,
+    double alpha, {
+    bool focused = false,
+  }) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(
+        color: (focused ? scheme.primary : scheme.onSurface).withValues(
+          alpha: alpha,
+        ),
+      ),
     );
   }
+}
+
+extension AppThemeColors on ColorScheme {
+  Color get cardSurface => surface.withValues(alpha: 0.74);
+  Color get softSurface => surface.withValues(alpha: 0.72);
+  Color get subtleBorder => onSurface.withValues(alpha: 0.13);
+  Color get mutedText => onSurface.withValues(alpha: 0.68);
+  Color get faintTrack => onSurface.withValues(alpha: 0.12);
+  Color get chartAxis => onSurface.withValues(alpha: 0.24);
+  Color get chartFill => primary.withValues(alpha: 0.14);
+  Color get chartLine => primary;
+  Color get chartPoint => secondary;
+  List<Color> get barGradient => [
+        primary.withValues(alpha: 0.85),
+        tertiary.withValues(alpha: 0.75),
+      ];
 }

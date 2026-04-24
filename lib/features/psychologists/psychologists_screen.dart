@@ -4,6 +4,7 @@ import '../../app/app_state.dart';
 import '../../app/home_screen.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/gradient_background.dart';
 import '../../core/widgets/smooth_widgets.dart';
 
@@ -164,10 +165,10 @@ class _PsychologistPracticeView extends ConsumerWidget {
                           ref
                               .read(appSessionProvider.notifier)
                               .approveAppointment(appointment);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Appointment approved.'),
-                            ),
+                          AppSnackBar.showSuccess(
+                            context,
+                            title: 'Approved',
+                            message: 'Appointment approved.',
                           );
                         },
                         icon: const Icon(Icons.check, size: 16),

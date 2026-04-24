@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 /// A smooth, rounded card widget with optional border and shadow
@@ -35,22 +37,35 @@ class SmoothCard extends StatelessWidget {
         ? Border.all(color: borderColor!, width: borderWidth)
         : null;
 
-    final cardWidget = Container(
-      decoration: BoxDecoration(
-        color: cardBgColor,
-        border: border,
-        borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: elevation > 0
-            ? [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: elevation,
-                  offset: Offset(0, elevation / 2),
-                ),
-              ]
-            : [],
+    final effectiveBorder = border ??
+        Border.all(
+          color: theme.dividerColor.withOpacity(0.55),
+          width: borderWidth,
+        );
+    final cardWidget = ClipRRect(
+      borderRadius: BorderRadius.circular(borderRadius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          decoration: BoxDecoration(
+            color: cardBgColor.withOpacity(
+              theme.brightness == Brightness.dark ? 0.64 : 0.72,
+            ),
+            border: effectiveBorder,
+            borderRadius: BorderRadius.circular(borderRadius),
+            boxShadow: elevation > 0
+                ? [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withOpacity(0.12),
+                      blurRadius: elevation,
+                      offset: Offset(0, elevation / 2),
+                    ),
+                  ]
+                : [],
+          ),
+          child: Padding(padding: padding, child: child),
+        ),
       ),
-      child: Padding(padding: padding, child: child),
     );
 
     if (onTap == null) {

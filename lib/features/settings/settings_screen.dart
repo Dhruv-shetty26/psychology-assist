@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../app/app_state.dart';
 import '../../app/theme_provider.dart';
 import '../../app/user_preferences_provider.dart';
@@ -8,6 +11,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/smooth_widgets.dart';
 import '../../core/widgets/animations.dart';
+import '../notifications/notifications_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -65,10 +69,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                           CircleAvatar(
                             radius: 28,
                             backgroundColor: Color(profile.avatarColorValue),
-                            child: Icon(
-                              _avatarIconFor(profile.avatarIconCodePoint),
-                              color: Colors.white,
-                            ),
+                            backgroundImage: profile.profileImagePath == null
+                                ? null
+                                : FileImage(File(profile.profileImagePath!)),
+                            child: profile.profileImagePath == null
+                                ? Icon(
+                                    _avatarIconFor(
+                                      profile.avatarIconCodePoint,
+                                    ),
+                                    color: Colors.white,
+                                  )
+                                : null,
                           ),
                           const SizedBox(width: 14),
                           Expanded(
@@ -237,6 +248,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 .updateMedicationRemindersEnabled(value);
                           },
                           enabled: preferences.notificationsEnabled,
+                        ),
+                        const SizedBox(height: 16),
+                        Divider(height: 1, color: theme.dividerColor),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: const Icon(Icons.notifications_active_outlined),
+                          title: const Text('Alert center'),
+                          subtitle: const Text('Test and schedule Calmora alerts'),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const NotificationsScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -458,6 +485,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     );
     var iconCodePoint = profile.avatarIconCodePoint;
     var colorValue = profile.avatarColorValue;
+    var profileImagePath = profile.profileImagePath;
     final icons = [
       Icons.person,
       Icons.self_improvement,
@@ -492,6 +520,44 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     labelText: profile.role == UserRole.psychologist
                         ? 'Professional email'
                         : 'Psychologist email',
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Center(
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 42,
+                        backgroundColor: Color(colorValue),
+                        backgroundImage: profileImagePath == null
+                            ? null
+                            : FileImage(File(profileImagePath!)),
+                        child: profileImagePath == null
+                            ? Icon(
+                                _avatarIconFor(iconCodePoint),
+                                color: Colors.white,
+                                size: 34,
+                              )
+                            : null,
+                      ),
+                      IconButton.filled(
+                        tooltip: 'Choose from gallery',
+                        onPressed: () async {
+                          final picked = await ImagePicker().pickImage(
+                            source: ImageSource.gallery,
+                            imageQuality: 82,
+                            maxWidth: 900,
+                          );
+                          if (picked != null) {
+                            setDialogState(
+                              () => profileImagePath = picked.path,
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.photo_library_outlined),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -548,6 +614,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                       : profile.psychologistEmail,
                   avatarIconCodePoint: iconCodePoint,
                   avatarColorValue: colorValue,
+                  profileImagePath: profileImagePath,
                 );
                 ref.read(appSessionProvider.notifier).updateProfile(updated);
                 Navigator.of(context).pop();
@@ -566,7 +633,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       builder: (context) => AlertDialog(
         title: const Text('Privacy Policy'),
         content: const Text(
-          'Psychol stores profile, moods, PIN settings, and appointments locally on this device for this prototype. Do not enter emergency or highly sensitive clinical information until production security and consent flows are finalized.',
+          'Calmora stores profile, moods, PIN settings, and appointments locally on this device for this prototype. Do not enter emergency or highly sensitive clinical information until production security and consent flows are finalized.',
         ),
         actions: [
           FilledButton(
@@ -584,7 +651,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
       builder: (context) => AlertDialog(
         title: const Text('Report a Bug'),
         content: const Text(
-          'Send issue details to support@psychol.demo with your device, steps to reproduce, and screenshots if available.',
+          'Send issue details to support@calmora.demo with your device, steps to reproduce, and screenshots if available.',
         ),
         actions: [
           FilledButton(

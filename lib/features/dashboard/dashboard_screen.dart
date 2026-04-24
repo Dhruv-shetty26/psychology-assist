@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/app_state.dart';
@@ -51,15 +53,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
             backgroundColor: Color(
               profile?.avatarColorValue ?? AppColors.neonViolet.value,
             ),
-            child: Icon(
-              _avatarIconFor(
-                profile?.avatarIconCodePoint ?? Icons.person.codePoint,
-              ),
-              color: Colors.white,
-            ),
+            backgroundImage: profile?.profileImagePath == null
+                ? null
+                : FileImage(File(profile!.profileImagePath!)),
+            child: profile?.profileImagePath == null
+                ? Icon(
+                    _avatarIconFor(
+                      profile?.avatarIconCodePoint ?? Icons.person.codePoint,
+                    ),
+                    color: Colors.white,
+                  )
+                : null,
           ),
         ),
-        title: const Text('Your Wellness'),
+        title: const Text('Calmora'),
       ),
       body: GradientBackground(
         child: SingleChildScrollView(
@@ -126,7 +133,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 const SizedBox(height: 16),
                 // Weekly Mood Trend Card
                 SmoothCard(
-                  backgroundColor: Colors.white.withOpacity(0.88),
+                  backgroundColor:
+                      theme.colorScheme.surface.withOpacity(0.72),
                   borderColor: AppColors.neonViolet.withOpacity(0.18),
                   elevation: 14,
                   borderRadius: 22,
@@ -193,7 +201,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
                 // Quick Insights Card
                 SmoothCard(
-                  backgroundColor: Colors.white.withOpacity(0.88),
+                  backgroundColor:
+                      theme.colorScheme.surface.withOpacity(0.72),
                   borderColor: AppColors.neonCyan.withOpacity(0.24),
                   borderRadius: 22,
                   padding: const EdgeInsets.all(20),

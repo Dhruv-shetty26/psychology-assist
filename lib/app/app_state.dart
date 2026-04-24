@@ -13,6 +13,7 @@ class AppProfile {
   final String? psychologistEmail;
   final int avatarIconCodePoint;
   final int avatarColorValue;
+  final String? profileImagePath;
 
   const AppProfile({
     required this.role,
@@ -22,6 +23,7 @@ class AppProfile {
     this.psychologistEmail,
     this.avatarIconCodePoint = 0xe7fd,
     this.avatarColorValue = 0xFF8B5CF6,
+    this.profileImagePath,
   });
 
   bool get hasPsychologist =>
@@ -35,6 +37,7 @@ class AppProfile {
     String? psychologistEmail,
     int? avatarIconCodePoint,
     int? avatarColorValue,
+    String? profileImagePath,
   }) {
     return AppProfile(
       role: role ?? this.role,
@@ -44,6 +47,7 @@ class AppProfile {
       psychologistEmail: psychologistEmail ?? this.psychologistEmail,
       avatarIconCodePoint: avatarIconCodePoint ?? this.avatarIconCodePoint,
       avatarColorValue: avatarColorValue ?? this.avatarColorValue,
+      profileImagePath: profileImagePath ?? this.profileImagePath,
     );
   }
 }
@@ -51,6 +55,8 @@ class AppProfile {
 class Appointment {
   final String psychologistEmail;
   final String psychologistName;
+  final String patientName;
+  final String? patientEmail;
   final DateTime startsAt;
   final String type;
   final String note;
@@ -59,11 +65,35 @@ class Appointment {
   const Appointment({
     required this.psychologistEmail,
     required this.psychologistName,
+    required this.patientName,
+    this.patientEmail,
     required this.startsAt,
     required this.type,
     required this.note,
-    this.confirmed = true,
+    this.confirmed = false,
   });
+
+  Appointment copyWith({
+    String? psychologistEmail,
+    String? psychologistName,
+    String? patientName,
+    String? patientEmail,
+    DateTime? startsAt,
+    String? type,
+    String? note,
+    bool? confirmed,
+  }) {
+    return Appointment(
+      psychologistEmail: psychologistEmail ?? this.psychologistEmail,
+      psychologistName: psychologistName ?? this.psychologistName,
+      patientName: patientName ?? this.patientName,
+      patientEmail: patientEmail ?? this.patientEmail,
+      startsAt: startsAt ?? this.startsAt,
+      type: type ?? this.type,
+      note: note ?? this.note,
+      confirmed: confirmed ?? this.confirmed,
+    );
+  }
 }
 
 class MoodEntry {
@@ -206,11 +236,27 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
 
   void addAppointment(Appointment appointment) {
     final updated = [
-      ...state.appointments.where(
-        (item) => item.startsAt.isBefore(DateTime.now()),
-      ),
+      ...state.appointments,
       appointment,
     ]..sort((a, b) => a.startsAt.compareTo(b.startsAt));
+    state = state.copyWith(appointments: updated);
+    _persist();
+  }
+
+  void approveAppointment(Appointment appointment) {
+    final updated = state.appointments
+        .map((item) => identical(item, appointment) || _sameAppointment(item, appointment)
+            ? item.copyWith(confirmed: true)
+            : item)
+        .toList();
+    state = state.copyWith(appointments: updated);
+    _persist();
+  }
+
+  void removeAppointment(Appointment appointment) {
+    final updated = state.appointments
+        .where((item) => !_sameAppointment(item, appointment))
+        .toList();
     state = state.copyWith(appointments: updated);
     _persist();
   }
@@ -255,5 +301,12 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
 
   Future<void> _persist() async {
     await _store.save(state);
+  }
+
+  bool _sameAppointment(Appointment a, Appointment b) {
+    return a.psychologistEmail == b.psychologistEmail &&
+        a.patientName == b.patientName &&
+        a.startsAt == b.startsAt &&
+        a.type == b.type;
   }
 }

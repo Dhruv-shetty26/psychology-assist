@@ -102,6 +102,7 @@ class AppSessionStore {
       'psychologistEmail': profile.psychologistEmail,
       'avatarIconCodePoint': profile.avatarIconCodePoint,
       'avatarColorValue': profile.avatarColorValue,
+      'profileImagePath': profile.profileImagePath,
     };
   }
 
@@ -119,6 +120,7 @@ class AppSessionStore {
       psychologistEmail: json['psychologistEmail'] as String?,
       avatarIconCodePoint: json['avatarIconCodePoint'] as int? ?? 0xe7fd,
       avatarColorValue: json['avatarColorValue'] as int? ?? 0xFF8B5CF6,
+      profileImagePath: json['profileImagePath'] as String?,
     );
   }
 
@@ -126,6 +128,8 @@ class AppSessionStore {
     return {
       'psychologistEmail': appointment.psychologistEmail,
       'psychologistName': appointment.psychologistName,
+      'patientName': appointment.patientName,
+      'patientEmail': appointment.patientEmail,
       'startsAt': appointment.startsAt.toIso8601String(),
       'type': appointment.type,
       'note': appointment.note,
@@ -141,10 +145,12 @@ class AppSessionStore {
           _psychologistNameForEmail(
             json['psychologistEmail'] as String? ?? demoPsychologistEmail,
           ),
+      patientName: json['patientName'] as String? ?? 'Demo Patient',
+      patientEmail: json['patientEmail'] as String?,
       startsAt: DateTime.parse(json['startsAt'] as String),
       type: json['type'] as String? ?? 'Video session',
       note: json['note'] as String? ?? '',
-      confirmed: json['confirmed'] as bool? ?? true,
+      confirmed: json['confirmed'] as bool? ?? false,
     );
   }
 

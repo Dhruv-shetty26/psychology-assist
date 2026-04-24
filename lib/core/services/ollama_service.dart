@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 class OllamaService {
+  static const defaultQuantizedModel = 'llama3.2:1b-instruct-q4_K_M';
+
   final Uri endpoint;
   final String model;
 
   const OllamaService({
     required this.endpoint,
-    this.model = 'llama3.2',
+    this.model = defaultQuantizedModel,
   });
 
   Future<String> summarize({
@@ -23,6 +25,11 @@ class OllamaService {
           'model': model,
           'prompt': prompt,
           'stream': false,
+          'options': {
+            'temperature': 0.4,
+            'num_predict': 220,
+            'num_ctx': 2048,
+          },
         }),
       );
       final response = await request.close().timeout(timeout);

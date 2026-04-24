@@ -61,6 +61,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
   }
 
   Future<void> _bookAppointment() async {
+    final profile = ref.read(appSessionProvider).profile;
     final email = _emailController.text.trim();
     if (!email.contains('@')) {
       _showMessage('Enter your psychologist email.');
@@ -101,10 +102,12 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
           Appointment(
             psychologistEmail: email,
             psychologistName: psychologist.name,
+            patientName: profile?.name ?? 'Patient',
+            patientEmail: profile?.email,
             startsAt: startsAt,
             type: _type,
             note: _noteController.text.trim(),
-            confirmed: true,
+            confirmed: false,
           ),
         );
 
@@ -113,7 +116,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
       _selectedDate = null;
       _selectedTime = null;
     });
-    _showMessage('Appointment confirmed.');
+    _showMessage('Appointment request sent.');
   }
 
   Future<bool> _confirmAppointment(
@@ -129,7 +132,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
               '${psychologist.name}\n'
               '${startsAt.day}/${startsAt.month}/${startsAt.year} at '
               '${startsAt.hour}:$minutes\n\n'
-              'This will replace any other future appointment.',
+              'Your psychologist can approve this from their patient dashboard.',
             ),
             actions: [
               TextButton(
@@ -177,7 +180,10 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                   child: SmoothCard(
                     borderRadius: 22,
                     elevation: 16,
-                    backgroundColor: Colors.white.withOpacity(0.9),
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .surface
+                        .withOpacity(0.72),
                     borderColor: AppColors.neonViolet.withOpacity(0.2),
                     padding: const EdgeInsets.all(18),
                     child: Column(
@@ -223,7 +229,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                           Text(
                             'Only one appointment can be active. Booking a new one replaces the current future appointment.',
                             style: AppTypography.bodySmall.copyWith(
-                              color: AppColors.lightSubtext,
+                              color: Theme.of(context).textTheme.bodySmall?.color,
                             ),
                           ),
                         ],
@@ -411,7 +417,7 @@ class _AppointmentCard extends StatelessWidget {
     final minutes = date.minute.toString().padLeft(2, '0');
     return SmoothCard(
       borderRadius: 20,
-      backgroundColor: Colors.white.withOpacity(0.92),
+      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.72),
       borderColor: AppColors.neonCyan.withOpacity(0.3),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -449,16 +455,22 @@ class _AppointmentCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.verified_outlined,
+                    Icon(
+                      appointment.confirmed
+                          ? Icons.verified_outlined
+                          : Icons.pending_actions_outlined,
                       size: 14,
-                      color: AppColors.success,
+                      color: appointment.confirmed
+                          ? AppColors.success
+                          : AppColors.warning,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       appointment.confirmed ? 'Confirmed' : 'Requested',
                       style: AppTypography.caption.copyWith(
-                        color: AppColors.success,
+                        color: appointment.confirmed
+                            ? AppColors.success
+                            : AppColors.warning,
                       ),
                     ),
                   ],
@@ -479,7 +491,7 @@ class _EmptyAppointments extends StatelessWidget {
   Widget build(BuildContext context) {
     return SmoothCard(
       borderRadius: 20,
-      backgroundColor: Colors.white.withOpacity(0.75),
+      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.72),
       padding: const EdgeInsets.all(20),
       child: const Row(
         children: [

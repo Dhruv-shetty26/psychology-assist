@@ -141,6 +141,20 @@ class NotificationService {
     }
   }
 
+  Future<void> scheduleMoodCheckInsEvery(int hours) async {
+    final interval = hours.clamp(2, 12);
+    await cancelMoodCheckIns();
+    for (var hour = 9; hour <= 21; hour += interval) {
+      await scheduleMoodCheckIn(hour: hour, minute: 0);
+    }
+  }
+
+  Future<void> cancelMoodCheckIns() async {
+    for (var hour = 0; hour < 24; hour++) {
+      await _notificationsPlugin.cancel(1000 + hour);
+    }
+  }
+
   /// Schedule a medication reminder
   Future<void> scheduleMedicationReminder({
     required int hour,

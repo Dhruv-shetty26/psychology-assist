@@ -192,6 +192,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 .updateNotificationsEnabled(value);
                             if (!value) {
                               NotificationService().cancelAllNotifications();
+                            } else if (preferences.moodCheckInsEnabled) {
+                              _scheduleMoodCheckIns(
+                                preferences.moodCheckInInterval,
+                              );
                             }
                           },
                         ),
@@ -209,9 +213,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                                 .read(userPreferencesProvider.notifier)
                                 .updateMoodCheckInsEnabled(value);
                             if (value) {
-                              _scheduleMoodCheckIn();
+                              _scheduleMoodCheckIns(
+                                preferences.moodCheckInInterval,
+                              );
                             } else {
-                              NotificationService().cancelNotification(1009);
+                              NotificationService().cancelMoodCheckIns();
                             }
                           },
                           enabled: preferences.notificationsEnabled,
@@ -260,10 +266,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             divisions: 5,
                             label: '${preferences.moodCheckInInterval}h',
                             onChanged: (value) {
+                              final hours = value.toInt();
                               ref
                                   .read(userPreferencesProvider.notifier)
-                                  .updateMoodCheckInInterval(value.toInt());
-                              _scheduleMoodCheckIn();
+                                  .updateMoodCheckInInterval(hours);
+                              _scheduleMoodCheckIns(hours);
                             },
                           ),
                           Text(
@@ -438,8 +445,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
     );
   }
 
-  Future<void> _scheduleMoodCheckIn() async {
-    await NotificationService().scheduleMoodCheckIn(hour: 9, minute: 0);
+  Future<void> _scheduleMoodCheckIns(int hours) async {
+    await NotificationService().scheduleMoodCheckInsEvery(hours);
   }
 
   void _editProfile(AppProfile profile) {

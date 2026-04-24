@@ -96,12 +96,49 @@ class Appointment {
   }
 }
 
+/// Represents a medication time for prescription reminders
+class MedicationTime {
+  final int hour;
+  final int minute;
+
+  const MedicationTime({
+    required this.hour,
+    required this.minute,
+  });
+
+  String toDisplayString() =>
+      '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+
+  MedicationTime copyWith({
+    int? hour,
+    int? minute,
+  }) {
+    return MedicationTime(
+      hour: hour ?? this.hour,
+      minute: minute ?? this.minute,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MedicationTime &&
+          runtimeType == other.runtimeType &&
+          hour == other.hour &&
+          minute == other.minute;
+
+  @override
+  int get hashCode => hour.hashCode ^ minute.hashCode;
+}
+
 class Prescription {
   final String patientName;
   final String? patientEmail;
   final String prescribedByName;
   final String prescribedByEmail;
   final List<String> medicines;
+  final List<MedicationTime>
+      reminderTimes; // Times to receive medication reminders
   final String note;
   final DateTime createdAt;
 
@@ -111,6 +148,7 @@ class Prescription {
     required this.prescribedByName,
     required this.prescribedByEmail,
     required this.medicines,
+    this.reminderTimes = const [],
     required this.note,
     required this.createdAt,
   });
@@ -121,6 +159,7 @@ class Prescription {
     String? prescribedByName,
     String? prescribedByEmail,
     List<String>? medicines,
+    List<MedicationTime>? reminderTimes,
     String? note,
     DateTime? createdAt,
   }) {
@@ -130,6 +169,7 @@ class Prescription {
       prescribedByName: prescribedByName ?? this.prescribedByName,
       prescribedByEmail: prescribedByEmail ?? this.prescribedByEmail,
       medicines: medicines ?? this.medicines,
+      reminderTimes: reminderTimes ?? this.reminderTimes,
       note: note ?? this.note,
       createdAt: createdAt ?? this.createdAt,
     );

@@ -237,10 +237,26 @@ class _PsychologistPracticeView extends ConsumerWidget {
                 child: ListTile(
                   title: Text(prescription.patientName,
                       style: AppTypography.labelLarge),
-                  subtitle: Text(
-                    '${prescription.medicines.join(', ')}\n${prescription.note}',
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${prescription.medicines.join(', ')}\n${prescription.note}',
+                      ),
+                      if (prescription.reminderTimes.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Reminders: ${prescription.reminderTimes.map((t) => t.toDisplayString()).join(', ')}',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.neonCyan,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  isThreeLine: prescription.note.isNotEmpty,
+                  isThreeLine: prescription.note.isNotEmpty ||
+                      prescription.reminderTimes.isNotEmpty,
                 ),
               ),
             ),
@@ -257,6 +273,7 @@ class _PsychologistPracticeView extends ConsumerWidget {
   ) async {
     final session = ref.read(appSessionProvider);
     final selectedMedicines = <String>[];
+    final selectedTimes = <MedicationTime>[];
     final noteController = TextEditingController();
     final patientName = appointment.patientName;
     final patientEmail = appointment.patientEmail;
@@ -328,6 +345,47 @@ class _PsychologistPracticeView extends ConsumerWidget {
                     .toList(),
               ),
               const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Text('Reminder Times:'),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (time != null) {
+                        final medicationTime = MedicationTime(
+                          hour: time.hour,
+                          minute: time.minute,
+                        );
+                        if (!selectedTimes.contains(medicationTime)) {
+                          setDialogState(
+                              () => selectedTimes.add(medicationTime));
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: selectedTimes
+                    .map(
+                      (time) => InputChip(
+                        label: Text(time.toDisplayString()),
+                        onDeleted: () {
+                          setDialogState(() => selectedTimes.remove(time));
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 12),
               TextField(
                 controller: noteController,
                 minLines: 2,
@@ -355,17 +413,32 @@ class _PsychologistPracticeView extends ConsumerWidget {
                 return;
               }
 
-              ref.read(appSessionProvider.notifier).addPrescription(
-                    Prescription(
-                      patientName: patientName,
-                      patientEmail: patientEmail,
-                      prescribedByName: doctorName,
-                      prescribedByEmail: doctorEmail,
-                      medicines: List<String>.from(selectedMedicines),
-                      note: noteController.text.trim(),
-                      createdAt: DateTime.now(),
-                    ),
-                  );
+              final prescription = Prescription(
+                patientName: patientName,
+                patientEmail: patientEmail,
+                prescribedByName: doctorName,
+                prescribedByEmail: doctorEmail,
+                medicines: List<String>.from(selectedMedicines),
+                reminderTimes: List<MedicationTime>.from(selectedTimes),
+                note: noteController.text.trim(),
+                createdAt: DateTime.now(),
+              );
+
+              ref
+                  .read(appSessionProvider.notifier)
+                  .addPrescription(prescription);
+
+              // Schedule medication reminders
+              if (selectedTimes.isNotEmpty) {
+                final notificationService = NotificationService();
+                notificationService.scheduleMedicationReminders(
+                  medicines: selectedMedicines,
+                  times: selectedTimes
+                      .map((t) => (hour: t.hour, minute: t.minute))
+                      .toList(),
+                );
+              }
+
               Navigator.of(context).pop();
               AppSnackBar.showSuccess(
                 context,

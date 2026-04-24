@@ -68,7 +68,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 : null,
           ),
         ),
-        title: const Text('Calmora'),
+        title: Text('Hey ${profile?.name ?? 'Ahmed'}'),
       ),
       body: GradientBackground(
         child: SingleChildScrollView(

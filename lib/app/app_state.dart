@@ -96,6 +96,46 @@ class Appointment {
   }
 }
 
+class Prescription {
+  final String patientName;
+  final String? patientEmail;
+  final String prescribedByName;
+  final String prescribedByEmail;
+  final List<String> medicines;
+  final String note;
+  final DateTime createdAt;
+
+  const Prescription({
+    required this.patientName,
+    this.patientEmail,
+    required this.prescribedByName,
+    required this.prescribedByEmail,
+    required this.medicines,
+    required this.note,
+    required this.createdAt,
+  });
+
+  Prescription copyWith({
+    String? patientName,
+    String? patientEmail,
+    String? prescribedByName,
+    String? prescribedByEmail,
+    List<String>? medicines,
+    String? note,
+    DateTime? createdAt,
+  }) {
+    return Prescription(
+      patientName: patientName ?? this.patientName,
+      patientEmail: patientEmail ?? this.patientEmail,
+      prescribedByName: prescribedByName ?? this.prescribedByName,
+      prescribedByEmail: prescribedByEmail ?? this.prescribedByEmail,
+      medicines: medicines ?? this.medicines,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+}
+
 class MoodEntry {
   final DateTime createdAt;
   final int value;
@@ -147,18 +187,33 @@ const demoPsychologists = [
   ),
 ];
 
+const demoMedicines = [
+  'Prozac',
+  'Valium',
+  'Sertraline',
+  'Lexapro',
+  'Wellbutrin',
+  'Zoloft',
+  'Buspirone',
+  'Melatonin',
+  'Hydroxyzine',
+];
+
 class AppSession {
   final bool onboardingComplete;
   final bool appLockSet;
   final String? lockPin;
   final AppProfile? profile;
   final List<Appointment> appointments;
+  final List<Prescription> prescriptions;
   final List<MoodEntry> moodEntries;
   final bool isLocked;
   final DateTime? lastUnlockedAt;
   final int lockTimeoutMinutes;
   final int currentStreak;
   final int longestStreak;
+  final String journalSummary;
+  final DateTime? journalUpdatedAt;
 
   const AppSession({
     this.onboardingComplete = false,
@@ -166,12 +221,15 @@ class AppSession {
     this.lockPin,
     this.profile,
     this.appointments = const [],
+    this.prescriptions = const [],
     this.moodEntries = const [],
     this.isLocked = false,
     this.lastUnlockedAt,
     this.lockTimeoutMinutes = 10,
     this.currentStreak = 0,
     this.longestStreak = 0,
+    this.journalSummary = '',
+    this.journalUpdatedAt,
   });
 
   AppSession copyWith({
@@ -180,12 +238,15 @@ class AppSession {
     String? lockPin,
     AppProfile? profile,
     List<Appointment>? appointments,
+    List<Prescription>? prescriptions,
     List<MoodEntry>? moodEntries,
     bool? isLocked,
     DateTime? lastUnlockedAt,
     int? lockTimeoutMinutes,
     int? currentStreak,
     int? longestStreak,
+    String? journalSummary,
+    DateTime? journalUpdatedAt,
   }) {
     return AppSession(
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
@@ -193,12 +254,15 @@ class AppSession {
       lockPin: lockPin ?? this.lockPin,
       profile: profile ?? this.profile,
       appointments: appointments ?? this.appointments,
+      prescriptions: prescriptions ?? this.prescriptions,
       moodEntries: moodEntries ?? this.moodEntries,
       isLocked: isLocked ?? this.isLocked,
       lastUnlockedAt: lastUnlockedAt ?? this.lastUnlockedAt,
       lockTimeoutMinutes: lockTimeoutMinutes ?? this.lockTimeoutMinutes,
       currentStreak: currentStreak ?? this.currentStreak,
       longestStreak: longestStreak ?? this.longestStreak,
+      journalSummary: journalSummary ?? this.journalSummary,
+      journalUpdatedAt: journalUpdatedAt ?? this.journalUpdatedAt,
     );
   }
 }
@@ -270,6 +334,23 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
     _persist();
   }
 
+  void addPrescription(Prescription prescription) {
+    final updated = [...state.prescriptions, prescription]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    state = state.copyWith(prescriptions: updated);
+    _persist();
+  }
+
+  void logout() {
+    state = state.copyWith(
+      onboardingComplete: false,
+      appLockSet: false,
+      isLocked: false,
+      profile: null,
+    );
+    _persist();
+  }
+
   void addMoodEntry(MoodEntry entry) {
     final updated = [...state.moodEntries, entry]
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
@@ -329,6 +410,14 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
 
   void updateProfile(AppProfile profile) {
     state = state.copyWith(profile: profile);
+    _persist();
+  }
+
+  void updateJournalSummary(String summary) {
+    state = state.copyWith(
+      journalSummary: summary,
+      journalUpdatedAt: DateTime.now(),
+    );
     _persist();
   }
 

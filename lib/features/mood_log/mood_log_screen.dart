@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 import '../../app/app_state.dart';
 import '../../app/home_screen.dart';
 import '../../core/theme/app_colors.dart';
@@ -21,8 +20,6 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
   final _journalController = TextEditingController();
   late AnimationController _animationController;
   bool _isSubmitted = false;
-  late SpeechToText _speechToText;
-  bool _isListening = false;
 
   final List<_MoodOption> _moods = [
     _MoodOption(
@@ -60,7 +57,6 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
   @override
   void initState() {
     super.initState();
-    _speechToText = SpeechToText();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -108,31 +104,6 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
         ref.read(selectedTabProvider.notifier).state = 0;
       }
     });
-  }
-
-  void _toggleListening() async {
-    if (_isListening) {
-      await _speechToText.stop();
-      setState(() => _isListening = false);
-    } else {
-      final available = await _speechToText.initialize();
-      if (available) {
-        setState(() => _isListening = true);
-        await _speechToText.listen(
-          onResult: (result) {
-            setState(() {
-              _journalController.text = result.recognizedWords;
-            });
-          },
-        );
-      } else {
-        AppSnackBar.showError(
-          context,
-          title: 'Speech not available',
-          message: 'Speech recognition is not available on this device.',
-        );
-      }
-    }
   }
 
   @override
@@ -245,15 +216,6 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
                         ),
                         filled: true,
                         fillColor: theme.colorScheme.surface,
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isListening ? Icons.mic_off : Icons.mic,
-                            color: _isListening
-                                ? AppColors.error
-                                : AppColors.neonCyan,
-                          ),
-                          onPressed: _toggleListening,
-                        ),
                       ),
                       style: AppTypography.bodyMedium.copyWith(
                         color: theme.textTheme.bodyMedium?.color,

@@ -157,6 +157,8 @@ class AppSession {
   final bool isLocked;
   final DateTime? lastUnlockedAt;
   final int lockTimeoutMinutes;
+  final int currentStreak;
+  final int longestStreak;
 
   const AppSession({
     this.onboardingComplete = false,
@@ -168,6 +170,8 @@ class AppSession {
     this.isLocked = false,
     this.lastUnlockedAt,
     this.lockTimeoutMinutes = 10,
+    this.currentStreak = 0,
+    this.longestStreak = 0,
   });
 
   AppSession copyWith({
@@ -180,6 +184,8 @@ class AppSession {
     bool? isLocked,
     DateTime? lastUnlockedAt,
     int? lockTimeoutMinutes,
+    int? currentStreak,
+    int? longestStreak,
   }) {
     return AppSession(
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
@@ -191,6 +197,8 @@ class AppSession {
       isLocked: isLocked ?? this.isLocked,
       lastUnlockedAt: lastUnlockedAt ?? this.lastUnlockedAt,
       lockTimeoutMinutes: lockTimeoutMinutes ?? this.lockTimeoutMinutes,
+      currentStreak: currentStreak ?? this.currentStreak,
+      longestStreak: longestStreak ?? this.longestStreak,
     );
   }
 }
@@ -245,9 +253,10 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
 
   void approveAppointment(Appointment appointment) {
     final updated = state.appointments
-        .map((item) => identical(item, appointment) || _sameAppointment(item, appointment)
-            ? item.copyWith(confirmed: true)
-            : item)
+        .map((item) =>
+            identical(item, appointment) || _sameAppointment(item, appointment)
+                ? item.copyWith(confirmed: true)
+                : item)
         .toList();
     state = state.copyWith(appointments: updated);
     _persist();
@@ -264,8 +273,58 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
   void addMoodEntry(MoodEntry entry) {
     final updated = [...state.moodEntries, entry]
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
-    state = state.copyWith(moodEntries: updated);
+    final streaks = _calculateStreaks(updated);
+    state = state.copyWith(
+      moodEntries: updated,
+      currentStreak: streaks['current']!,
+      longestStreak: streaks['longest']!,
+    );
     _persist();
+  }
+
+  Map<String, int> _calculateStreaks(List<MoodEntry> entries) {
+    if (entries.isEmpty) return {'current': 0, 'longest': 0};
+
+    // Get unique days with entries
+    final days = entries
+        .map((e) =>
+            DateTime(e.createdAt.year, e.createdAt.month, e.createdAt.day))
+        .toSet()
+        .toList()
+      ..sort();
+
+    int currentStreak = 0;
+    int longestStreak = 0;
+    int tempStreak = 1;
+
+    for (int i = 1; i < days.length; i++) {
+      final diff = days[i].difference(days[i - 1]).inDays;
+      if (diff == 1) {
+        tempStreak++;
+      } else {
+        longestStreak = tempStreak > longestStreak ? tempStreak : longestStreak;
+        tempStreak = 1;
+      }
+    }
+    longestStreak = tempStreak > longestStreak ? tempStreak : longestStreak;
+
+    // Current streak: if last entry is today or yesterday, count back
+    final today =
+        DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final lastDay = days.last;
+    if (lastDay == today ||
+        lastDay == today.subtract(const Duration(days: 1))) {
+      currentStreak = 1;
+      for (int i = days.length - 2; i >= 0; i--) {
+        if (days[i + 1].difference(days[i]).inDays == 1) {
+          currentStreak++;
+        } else {
+          break;
+        }
+      }
+    }
+
+    return {'current': currentStreak, 'longest': longestStreak};
   }
 
   void updateProfile(AppProfile profile) {

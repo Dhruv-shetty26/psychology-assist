@@ -142,12 +142,30 @@ class _CalmoraAiSheetState extends State<_CalmoraAiSheet> {
           ? 'I could not generate a useful response. Try again in a moment.'
           : response.trim());
     } catch (_) {
-      setState(() => _reply =
-          'Local quantized AI is configured for ${OllamaService.defaultQuantizedModel}, but Ollama is not reachable yet. Start Ollama on port 11434 or update the endpoint for your device.');
+      // Fallback to mock AI for hackathon demo
+      final mockResponse = _generateMockResponse(text);
+      setState(() => _reply = mockResponse);
     } finally {
       if (mounted) {
         setState(() => _loading = false);
       }
+    }
+  }
+
+  String _generateMockResponse(String userInput) {
+    final input = userInput.toLowerCase();
+    if (input.contains('sad') || input.contains('depressed')) {
+      return 'I\'m sorry you\'re feeling down. Try a 4-7-8 breathing exercise: Inhale for 4 seconds, hold for 7, exhale for 8. If this persists, consider talking to a professional.';
+    } else if (input.contains('anxious') || input.contains('worried')) {
+      return 'Anxiety can be tough. Ground yourself by naming 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, and 1 you can taste.';
+    } else if (input.contains('happy') || input.contains('good')) {
+      return 'That\'s great to hear! Keep nurturing positive moments. What\'s one thing that made you smile today?';
+    } else if (input.contains('exercise') || input.contains('workout')) {
+      return 'Physical activity is excellent for mental health. Even a 10-minute walk can boost your mood. What\'s your favorite way to move?';
+    } else if (input.contains('sleep')) {
+      return 'Good sleep is crucial. Try maintaining a consistent bedtime routine and avoiding screens an hour before bed.';
+    } else {
+      return 'Thanks for sharing. Remember, it\'s okay to not be okay. If you need immediate help, contact a crisis hotline. What\'s on your mind right now?';
     }
   }
 

@@ -6,6 +6,7 @@ import '../../app/app_state.dart';
 import '../../app/home_screen.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/services/ollama_service.dart';
 import '../../core/widgets/gradient_background.dart';
 import '../../core/widgets/smooth_widgets.dart';
 import '../../core/widgets/animations.dart';
@@ -88,9 +89,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       theme.colorScheme.tertiary,
                     ],
                   ),
-                  borderColor: theme.colorScheme.primary.withValues(alpha: 0.28),
+                  borderColor:
+                      theme.colorScheme.primary.withValues(alpha: 0.28),
                   waveColorA: Colors.white.withValues(alpha: 0.16),
-                  waveColorB: theme.colorScheme.secondary.withValues(alpha: 0.18),
+                  waveColorB:
+                      theme.colorScheme.secondary.withValues(alpha: 0.18),
                   child: Row(
                     children: [
                       Padding(
@@ -140,8 +143,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                 const SizedBox(height: 16),
                 // Weekly Mood Trend Card
                 SmoothCard(
-                  backgroundColor:
-                      theme.colorScheme.surface.withOpacity(0.72),
+                  backgroundColor: theme.colorScheme.surface.withOpacity(0.72),
                   borderColor: AppColors.neonViolet.withOpacity(0.18),
                   elevation: 14,
                   borderRadius: 22,
@@ -208,8 +210,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
 
                 // Quick Insights Card
                 SmoothCard(
-                  backgroundColor:
-                      theme.colorScheme.surface.withOpacity(0.72),
+                  backgroundColor: theme.colorScheme.surface.withOpacity(0.72),
                   borderColor: AppColors.neonCyan.withOpacity(0.24),
                   borderRadius: 22,
                   padding: const EdgeInsets.all(20),
@@ -243,6 +244,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                             '${ref.watch(appSessionProvider).moodEntries.length}',
                         theme: theme,
                       ),
+                      const SizedBox(height: 12),
+                      Divider(
+                        height: 1,
+                        color: theme.dividerColor,
+                      ),
+                      const SizedBox(height: 12),
+                      _InsightRow(
+                        icon: Icons.local_fire_department,
+                        title: 'Current Streak',
+                        value:
+                            '${ref.watch(appSessionProvider).currentStreak} days',
+                        theme: theme,
+                      ),
                     ],
                   ),
                 ),
@@ -260,6 +274,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                     textColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
+                ),
+                const SizedBox(height: 16),
+                // Quick Actions
+                Row(
+                  children: [
+                    Expanded(
+                      child: SmoothButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/breathing');
+                        },
+                        label: 'Breathe',
+                        backgroundColor: AppColors.neonCyan,
+                        textColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SmoothButton(
+                        onPressed: () => _showAiChat(context),
+                        label: 'AI Chat',
+                        backgroundColor: AppColors.neonViolet,
+                        textColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 32),
               ],
@@ -300,6 +341,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     return entries.last.label;
   }
 
+  void _showAiChat(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) => const _CalmoraAiSheet(),
+    );
+  }
+
   IconData _avatarIconFor(int codePoint) {
     const icons = [
       Icons.person,
@@ -310,6 +360,140 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
     return icons.firstWhere(
       (icon) => icon.codePoint == codePoint,
       orElse: () => Icons.person,
+    );
+  }
+}
+
+/// Calmora AI Sheet
+class _CalmoraAiSheet extends StatefulWidget {
+  const _CalmoraAiSheet();
+
+  @override
+  State<_CalmoraAiSheet> createState() => _CalmoraAiSheetState();
+}
+
+class _CalmoraAiSheetState extends State<_CalmoraAiSheet> {
+  final _controller = TextEditingController();
+  final _ai = OllamaService(
+    endpoint: Uri.parse('http://10.0.2.2:11434/api/generate'),
+  );
+  String _reply =
+      'Ask for a grounding exercise, journaling prompt, or appointment prep.';
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty || _loading) {
+      return;
+    }
+    setState(() => _loading = true);
+    try {
+      final response = await _ai.summarize(
+        prompt: 'You are Calmora, a concise mental wellness assistant. '
+            'Be warm, practical, non-clinical, and suggest emergency help for crisis risk.\n\nUser: $text',
+      );
+      setState(() => _reply = response.trim().isEmpty
+          ? 'I could not generate a useful response. Try again in a moment.'
+          : response.trim());
+    } catch (_) {
+      // Fallback to mock AI for hackathon demo
+      final mockResponse = _generateMockResponse(text);
+      setState(() => _reply = mockResponse);
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  String _generateMockResponse(String userInput) {
+    final input = userInput.toLowerCase();
+    if (input.contains('sad') || input.contains('depressed')) {
+      return 'I\'m sorry you\'re feeling down. Try a 4-7-8 breathing exercise: Inhale for 4 seconds, hold for 7, exhale for 8. If this persists, consider talking to a professional.';
+    } else if (input.contains('anxious') || input.contains('worried')) {
+      return 'Anxiety can be tough. Ground yourself by naming 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, and 1 you can taste.';
+    } else if (input.contains('happy') || input.contains('good')) {
+      return 'That\'s great to hear! Keep nurturing positive moments. What\'s one thing that made you smile today?';
+    } else if (input.contains('exercise') || input.contains('workout')) {
+      return 'Physical activity is excellent for mental health. Even a 10-minute walk can boost your mood. What\'s your favorite way to move?';
+    } else if (input.contains('sleep')) {
+      return 'Good sleep is crucial. Try maintaining a consistent bedtime routine and avoiding screens an hour before bed.';
+    } else {
+      return 'Thanks for sharing. Remember, it\'s okay to not be okay. If you need immediate help, contact a crisis hotline. What\'s on your mind right now?';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 18,
+        right: 18,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome, color: AppColors.neonCyan),
+              const SizedBox(width: 10),
+              Text(
+                'Calmora AI',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'Q4 local',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withOpacity(0.72),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: _loading
+                ? const LinearProgressIndicator()
+                : Text(_reply, style: theme.textTheme.bodyMedium),
+          ),
+          const SizedBox(height: 14),
+          TextField(
+            controller: _controller,
+            decoration: InputDecoration(
+              hintText: 'Ask me anything...',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              suffixIcon: IconButton(
+                onPressed: _send,
+                icon: const Icon(Icons.send),
+              ),
+            ),
+            maxLines: 3,
+            minLines: 1,
+            textInputAction: TextInputAction.send,
+            onSubmitted: (_) => _send(),
+          ),
+        ],
+      ),
     );
   }
 }

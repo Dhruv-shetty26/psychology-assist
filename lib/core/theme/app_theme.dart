@@ -48,24 +48,98 @@ class AppTheme {
 
   static ThemeData journal() {
     const paperBg = Color(0xFFF6F1E8);
+    const cream = Color(0xFFFDFBF7);
     const ink = Color(0xFF1E2A38);
-    const accent = Color(0xFFB7C97B); // soft green
-    const card = Color(0xFFFFFFFF);
+    const softGreen = Color(0xFFB7C97B);
+    const softBrown = Color(0xFFAA8B6F);
 
     final scheme = ColorScheme.light(
       primary: ink,
-      secondary: accent,
-      tertiary: ink,
-      surface: card,
+      secondary: softGreen,
+      tertiary: softBrown,
+      surface: cream,
+      error: const Color(0xFFB3261E),
       onPrimary: Colors.white,
       onSecondary: ink,
+      onTertiary: Colors.white,
       onSurface: ink,
+      onError: Colors.white,
     );
 
-    final textTheme = GoogleFonts.caveatTextTheme().copyWith(
-      bodyMedium: GoogleFonts.indieFlower(
-        fontSize: 16,
+    // Handwritten-style text theme
+    final baseText = ThemeData.light().textTheme;
+    final textTheme = GoogleFonts.caveatTextTheme(baseText).copyWith(
+      displayLarge: GoogleFonts.caveat(
+        fontSize: 32,
+        fontWeight: FontWeight.w700,
         color: ink,
+        height: 1.2,
+      ),
+      displayMedium: GoogleFonts.caveat(
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+        color: ink,
+        height: 1.2,
+      ),
+      displaySmall: GoogleFonts.caveat(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: ink,
+        height: 1.3,
+      ),
+      titleLarge: GoogleFonts.caveat(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        color: ink,
+        height: 1.3,
+      ),
+      titleMedium: GoogleFonts.caveat(
+        fontSize: 18,
+        fontWeight: FontWeight.w600,
+        color: ink,
+        height: 1.3,
+      ),
+      titleSmall: GoogleFonts.caveat(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: ink,
+        height: 1.4,
+      ),
+      bodyLarge: GoogleFonts.indieFlower(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+        color: ink,
+        height: 1.5,
+      ),
+      bodyMedium: GoogleFonts.indieFlower(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: ink,
+        height: 1.5,
+      ),
+      bodySmall: GoogleFonts.indieFlower(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        color: ink,
+        height: 1.5,
+      ),
+      labelLarge: GoogleFonts.caveat(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: ink,
+        height: 1.4,
+      ),
+      labelMedium: GoogleFonts.caveat(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: ink,
+        height: 1.4,
+      ),
+      labelSmall: GoogleFonts.caveat(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: ink,
+        height: 1.3,
       ),
     );
 
@@ -75,34 +149,138 @@ class AppTheme {
       colorScheme: scheme,
       scaffoldBackgroundColor: paperBg,
       textTheme: textTheme,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
+      appBarTheme: AppBarTheme(
+        backgroundColor: paperBg,
         elevation: 0,
         foregroundColor: ink,
+        centerTitle: true,
+        titleTextStyle: GoogleFonts.caveat(
+          fontSize: 24,
+          fontWeight: FontWeight.w600,
+          color: ink,
+        ),
       ),
       cardTheme: CardThemeData(
-        color: card,
+        color: cream,
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: ink, width: 1.2),
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: ink.withValues(alpha: 0.2), width: 1.2),
         ),
+      ),
+      dividerTheme: DividerThemeData(
+        color: ink.withValues(alpha: 0.15),
+        thickness: 1,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: cream,
+        hintStyle: GoogleFonts.indieFlower(
+          color: ink.withValues(alpha: 0.45),
+          fontWeight: FontWeight.w500,
+        ),
+        labelStyle: GoogleFonts.caveat(
+          color: ink.withValues(alpha: 0.72),
+          fontWeight: FontWeight.w600,
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: ink.withValues(alpha: 0.15), width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: ink.withValues(alpha: 0.15), width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: ink, width: 1.5),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: cream,
+        selectedColor: softGreen.withValues(alpha: 0.2),
+        disabledColor: ink.withValues(alpha: 0.05),
+        side: BorderSide(color: ink.withValues(alpha: 0.2)),
+        labelStyle: GoogleFonts.indieFlower(color: ink),
+        secondaryLabelStyle: GoogleFonts.indieFlower(color: ink),
+        brightness: Brightness.light,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: ink,
-          foregroundColor: Colors.white,
+          foregroundColor: cream,
+          elevation: 2,
+          textStyle: GoogleFonts.caveat(
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
       ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: ink,
+          foregroundColor: cream,
+          textStyle: GoogleFonts.caveat(
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: ink,
+          side: BorderSide(color: ink.withValues(alpha: 0.3)),
+          textStyle: GoogleFonts.caveat(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: softGreen,
+        foregroundColor: ink,
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: ink.withValues(alpha: 0.95),
+        elevation: 2,
+        insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+        contentTextStyle: GoogleFonts.indieFlower(color: cream),
+      ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: paperBg,
+        backgroundColor: cream,
         selectedItemColor: ink,
-        unselectedItemColor: ink.withOpacity(0.5),
+        unselectedItemColor: ink.withValues(alpha: 0.5),
+        selectedLabelStyle: GoogleFonts.caveat(
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: GoogleFonts.caveat(
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        ),
         type: BottomNavigationBarType.fixed,
       ),
+      pageTransitionsTheme: _pageTransitions,
     );
   }
 

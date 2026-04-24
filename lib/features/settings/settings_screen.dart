@@ -178,6 +178,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                             ),
                           ],
                         ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _ThemeButton(
+                                title: 'Journal',
+                                icon: Icons.edit_note,
+                                isSelected:
+                                    currentTheme == AppThemeMode.journal,
+                                onTap: () {
+                                  ref
+                                      .read(themeModeProvider.notifier)
+                                      .setThemeMode(AppThemeMode.journal);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(child: SizedBox()),
+                            const SizedBox(width: 12),
+                            Expanded(child: SizedBox()),
+                          ],
+                        ),
                       ],
                     ),
                   ),

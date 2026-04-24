@@ -247,7 +247,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                     const SizedBox(height: 20),
                     SmoothButton(
-                      label: 'Enter Psychol',
+                      label: 'Enter Calmora',
                       icon:
                           const Icon(Icons.arrow_forward, color: Colors.white),
                       backgroundColor: AppColors.neonViolet,
@@ -293,7 +293,7 @@ class _NeonHeader extends StatelessWidget {
           const Icon(Icons.auto_awesome, color: Colors.white, size: 30),
           const SizedBox(height: 20),
           Text(
-            'Welcome to Psychol',
+            'Welcome to Calmora',
             style: AppTypography.displayMedium.copyWith(color: Colors.white),
           ),
           const SizedBox(height: 8),

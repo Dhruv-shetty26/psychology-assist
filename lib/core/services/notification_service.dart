@@ -62,8 +62,8 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'psychol_channel',
-      'Psychol Notifications',
+      'calmora_channel',
+      'Calmora Notifications',
       channelDescription: 'Mood check-ins and reminders',
       importance: Importance.high,
       priority: Priority.high,
@@ -88,7 +88,7 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'psychol_checkin',
+      'calmora_checkin',
       'Mood Check-ins',
       channelDescription: 'Daily mood check-in reminders',
       importance: Importance.high,
@@ -163,7 +163,7 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'psychol_medication',
+      'calmora_medication',
       'Medication Reminders',
       channelDescription: 'Daily medication reminders',
       importance: Importance.high,

@@ -71,22 +71,27 @@ class PsychologistsScreen extends ConsumerWidget {
   }
 }
 
-class _PsychologistPracticeView extends StatelessWidget {
+class _PsychologistPracticeView extends ConsumerWidget {
   final AppSession session;
 
   const _PsychologistPracticeView({required this.session});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final email = session.profile?.email ?? demoPsychologistEmail;
     final linkedAppointments = session.appointments
         .where((appointment) => appointment.psychologistEmail == email)
         .toList();
+    final patients = <String>{};
+    for (final appointment in linkedAppointments) {
+      patients.add(appointment.patientName);
+    }
 
     if (linkedAppointments.isEmpty) {
-      return const SmoothCard(
+      return SmoothCard(
         borderRadius: 18,
-        child: Row(
+        backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.72),
+        child: const Row(
           children: [
             Icon(Icons.inbox_outlined, color: AppColors.neonViolet),
             SizedBox(width: 12),
@@ -97,31 +102,82 @@ class _PsychologistPracticeView extends StatelessWidget {
     }
 
     return Column(
-      children: linkedAppointments
-          .map(
-            (appointment) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: SmoothCard(
-                borderRadius: 18,
-                child: ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const CircleAvatar(
-                    backgroundColor: AppColors.neonViolet,
-                    child: Icon(Icons.person_outline, color: Colors.white),
-                  ),
-                  title: Text(appointment.type),
-                  subtitle: Text(
-                    '${appointment.startsAt.day}/${appointment.startsAt.month}/${appointment.startsAt.year}',
-                  ),
-                  trailing: const Icon(
-                    Icons.verified_outlined,
-                    color: AppColors.success,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SmoothCard(
+          borderRadius: 18,
+          backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.72),
+          borderColor: AppColors.neonCyan.withOpacity(0.24),
+          child: Row(
+            children: [
+              const Icon(Icons.groups_2_outlined, color: AppColors.neonCyan),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '${patients.length} active patients',
+                  style: AppTypography.labelLarge.copyWith(
+                    color: Theme.of(context).textTheme.labelLarge?.color,
                   ),
                 ),
               ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        ...linkedAppointments.map(
+          (appointment) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: SmoothCard(
+              borderRadius: 18,
+              backgroundColor:
+                  Theme.of(context).colorScheme.surface.withOpacity(0.72),
+              borderColor: appointment.confirmed
+                  ? AppColors.success.withOpacity(0.22)
+                  : AppColors.warning.withOpacity(0.32),
+              child: ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: CircleAvatar(
+                  backgroundColor: appointment.confirmed
+                      ? AppColors.success
+                      : AppColors.warning,
+                  child: const Icon(Icons.person_outline, color: Colors.white),
+                ),
+                title: Text(
+                  appointment.patientName,
+                  style: AppTypography.labelLarge.copyWith(
+                    color: Theme.of(context).textTheme.labelLarge?.color,
+                  ),
+                ),
+                subtitle: Text(
+                  '${appointment.type}\n${appointment.startsAt.day}/${appointment.startsAt.month}/${appointment.startsAt.year}'
+                  ' at ${appointment.startsAt.hour}:${appointment.startsAt.minute.toString().padLeft(2, '0')}'
+                  '${appointment.note.isEmpty ? '' : '\n${appointment.note}'}',
+                ),
+                isThreeLine: appointment.note.isNotEmpty,
+                trailing: appointment.confirmed
+                    ? const Icon(
+                        Icons.verified_outlined,
+                        color: AppColors.success,
+                      )
+                    : FilledButton.icon(
+                        onPressed: () {
+                          ref
+                              .read(appSessionProvider.notifier)
+                              .approveAppointment(appointment);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Appointment approved.'),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.check, size: 16),
+                        label: const Text('Approve'),
+                      ),
+              ),
             ),
-          )
-          .toList(),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -135,7 +191,7 @@ class _PsychologistCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SmoothCard(
       borderRadius: 18,
-      backgroundColor: Colors.white.withOpacity(0.9),
+      backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.72),
       borderColor: AppColors.neonViolet.withOpacity(0.18),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

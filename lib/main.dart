@@ -49,7 +49,7 @@ class MyApp extends ConsumerWidget {
     }
 
     return MaterialApp(
-      title: 'Psychol - Your Wellness Companion',
+      title: 'Calmora',
       theme: getTheme(themeMode),
       darkTheme: AppThemes.darkTheme,
       themeMode:

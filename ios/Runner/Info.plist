@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Psychol</string>
+	<string>Calmora</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,13 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>psychol</string>
+	<string>Calmora</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Calmora lets you choose a profile photo from your gallery.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Calmora uses the microphone for voice notes and AI chat dictation.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Calmora uses speech recognition to turn your voice into text.</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

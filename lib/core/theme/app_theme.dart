@@ -8,7 +8,7 @@ class AppThemes {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: AppColors.lightPrimary,
       secondary: AppColors.lightSecondary,
       tertiary: AppColors.lightAccent,
@@ -28,7 +28,7 @@ class AppThemes {
       ),
       iconTheme: const IconThemeData(color: AppColors.lightText),
     ),
-    cardTheme: CardThemeData(
+    cardTheme: CardTheme(
       color: AppColors.lightSurface,
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -132,13 +132,12 @@ class AppThemes {
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.dark(
+    colorScheme: const ColorScheme.dark(
       primary: AppColors.darkPrimary,
       secondary: AppColors.darkSecondary,
       tertiary: AppColors.darkAccent,
       surface: AppColors.darkSurface,
       background: AppColors.darkBg,
-      error: AppColors.error,
       error: AppColors.error,
       onPrimary: AppColors.darkBg,
       onSecondary: AppColors.darkBg,
@@ -154,7 +153,9 @@ class AppThemes {
       ),
       iconTheme: const IconThemeData(color: AppColors.darkText),
     ),
-    cardTheme: CardThemeData
+    cardTheme: CardTheme(
+      color: AppColors.darkSurface,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: AppColors.darkBorder, width: 0.5),
@@ -254,13 +255,12 @@ class AppThemes {
   static ThemeData medicalTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: AppColors.medicalPrimary,
       secondary: AppColors.medicalSecondary,
       tertiary: AppColors.medicalAccent,
       surface: AppColors.medicalSurface,
       background: AppColors.medicalBg,
-      error: AppColors.error,
       error: AppColors.error,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
@@ -276,7 +276,9 @@ class AppThemes {
       ),
       iconTheme: const IconThemeData(color: AppColors.medicalText),
     ),
-    cardTheme: CardThemeData
+    cardTheme: CardTheme(
+      color: AppColors.medicalSurface,
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: AppColors.medicalBorder, width: 0.5),
@@ -397,22 +399,22 @@ class _CustomThemeExtension extends ThemeExtension<_CustomThemeExtension> {
   });
 
   factory _CustomThemeExtension.light() => _CustomThemeExtension(
-    cardBorder: AppColors.lightBorder,
-    shadowColor: const Color(0x1A000000),
-    cardRadius: 16,
-  );
+        cardBorder: AppColors.lightBorder,
+        shadowColor: const Color(0x1A000000),
+        cardRadius: 16,
+      );
 
   factory _CustomThemeExtension.dark() => _CustomThemeExtension(
-    cardBorder: AppColors.darkBorder,
-    shadowColor: const Color(0x4D000000),
-    cardRadius: 16,
-  );
+        cardBorder: AppColors.darkBorder,
+        shadowColor: const Color(0x4D000000),
+        cardRadius: 16,
+      );
 
   factory _CustomThemeExtension.medical() => _CustomThemeExtension(
-    cardBorder: AppColors.medicalBorder,
-    shadowColor: const Color(0x1A000000),
-    cardRadius: 16,
-  );
+        cardBorder: AppColors.medicalBorder,
+        shadowColor: const Color(0x1A000000),
+        cardRadius: 16,
+      );
 
   @override
   ThemeExtension<_CustomThemeExtension> copyWith({

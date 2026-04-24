@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/home_screen.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/smooth_widgets.dart';
-import '../../core/widgets/animations.dart';
 
 class MoodLogScreen extends ConsumerStatefulWidget {
-  const MoodLogScreen({Key? key}) : super(key: key);
+  const MoodLogScreen({super.key});
 
   @override
   ConsumerState<MoodLogScreen> createState() => _MoodLogScreenState();
@@ -249,11 +249,11 @@ class _MoodLogScreenState extends ConsumerState<MoodLogScreen>
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      width: double.in{
-                          ref.read(selectedTabProvider.notifier).state = 0;
-                        }
+                      width: double.infinity,
                       child: SmoothButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          ref.read(selectedTabProvider.notifier).state = 0;
+                        },
                         label: 'Cancel',
                         isOutlined: true,
                         backgroundColor: theme.colorScheme.primary,
@@ -391,9 +391,8 @@ class _MoodSelectorState extends State<_MoodSelector>
                   color: widget.isSelected
                       ? widget.mood.color
                       : Theme.of(context).textTheme.bodySmall?.color,
-                  fontWeight: widget.isSelected
-                      ? FontWeight.w700
-                      : FontWeight.w500,
+                  fontWeight:
+                      widget.isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
                 textAlign: TextAlign.center,
               ),

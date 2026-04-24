@@ -14,7 +14,7 @@ class SmoothCard extends StatelessWidget {
   final Duration animationDuration;
 
   const SmoothCard({
-    Key? key,
+    super.key,
     required this.child,
     this.backgroundColor,
     this.borderColor,
@@ -25,7 +25,7 @@ class SmoothCard extends StatelessWidget {
     this.elevation = 0,
     this.onTap,
     this.animationDuration = const Duration(milliseconds: 200),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +86,7 @@ class SmoothButton extends StatefulWidget {
   final bool isOutlined;
 
   const SmoothButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.label,
     this.backgroundColor,
@@ -97,7 +97,7 @@ class SmoothButton extends StatefulWidget {
     this.isEnabled = true,
     this.icon,
     this.isOutlined = false,
-  }) : super(key: key);
+  });
 
   @override
   State<SmoothButton> createState() => _SmoothButtonState();
@@ -193,7 +193,7 @@ class SmoothTextField extends StatefulWidget {
   final bool obscureText;
 
   const SmoothTextField({
-    Key? key,
+    super.key,
     required this.label,
     this.hint,
     this.controller,
@@ -205,7 +205,7 @@ class SmoothTextField extends StatefulWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
-  }) : super(key: key);
+  });
 
   @override
   State<SmoothTextField> createState() => _SmoothTextFieldState();

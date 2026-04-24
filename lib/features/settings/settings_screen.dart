@@ -8,7 +8,7 @@ import '../../core/widgets/smooth_widgets.dart';
 import '../../core/widgets/animations.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
@@ -47,6 +47,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: StaggeredAnimationBuilder(
+            duration: const Duration(milliseconds: 600),
+            delay: const Duration(milliseconds: 80),
             children: [
               // Theme Section
               _SettingsSection(
@@ -272,11 +274,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _SettingsInfo(label: 'App Version', value: '1.0.0'),
+                        const _SettingsInfo(
+                          label: 'App Version',
+                          value: '1.0.0',
+                        ),
                         const SizedBox(height: 12),
                         Divider(height: 1, color: theme.dividerColor),
                         const SizedBox(height: 12),
-                        _SettingsInfo(
+                        const _SettingsInfo(
                           label: 'Built with',
                           value: 'Flutter + Riverpod',
                         ),
@@ -300,8 +305,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
               ),
               const SizedBox(height: 32),
             ],
-            duration: const Duration(milliseconds: 600),
-            delay: const Duration(milliseconds: 80),
           ),
         ),
       ),

@@ -32,9 +32,8 @@ class MyApp extends ConsumerWidget {
       title: 'Psychol - Your Wellness Companion',
       theme: getTheme(themeMode),
       darkTheme: AppThemes.darkTheme,
-      themeMode: themeMode == AppThemeMode.dark
-          ? ThemeMode.dark
-          : ThemeMode.light,
+      themeMode:
+          themeMode == AppThemeMode.dark ? ThemeMode.dark : ThemeMode.light,
       home: const HomeScreen(),
       onGenerateRoute: AppRouter.generateRoute,
       debugShowCheckedModeBanner: false,

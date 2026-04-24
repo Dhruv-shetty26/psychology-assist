@@ -6,8 +6,8 @@ enum AppThemeMode { light, dark, medical }
 /// Riverpod provider for theme mode state
 final themeModeProvider =
     StateNotifierProvider<ThemeModeNotifier, AppThemeMode>(
-      (ref) => ThemeModeNotifier(),
-    );
+  (ref) => ThemeModeNotifier(),
+);
 
 /// State notifier for managing theme changes
 class ThemeModeNotifier extends StateNotifier<AppThemeMode> {

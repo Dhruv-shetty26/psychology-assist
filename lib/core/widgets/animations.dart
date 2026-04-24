@@ -13,24 +13,24 @@ class SmoothPageTransition extends PageRouteBuilder {
     this.curve = Curves.easeInOutCubic,
     this.axisDirection = AxisDirection.right,
   }) : super(
-         pageBuilder: (context, animation, secondaryAnimation) => page,
-         transitionDuration: duration,
-         reverseTransitionDuration: duration,
-         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-           final tween = Tween(
-             begin: _getOffset(axisDirection),
-             end: Offset.zero,
-           );
-           final offsetAnimation = animation.drive(
-             tween.chain(CurveTween(curve: curve)),
-           );
+          pageBuilder: (context, animation, secondaryAnimation) => page,
+          transitionDuration: duration,
+          reverseTransitionDuration: duration,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final tween = Tween(
+              begin: _getOffset(axisDirection),
+              end: Offset.zero,
+            );
+            final offsetAnimation = animation.drive(
+              tween.chain(CurveTween(curve: curve)),
+            );
 
-           return FadeTransition(
-             opacity: animation,
-             child: SlideTransition(position: offsetAnimation, child: child),
-           );
-         },
-       );
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(position: offsetAnimation, child: child),
+            );
+          },
+        );
 
   static Offset _getOffset(AxisDirection direction) {
     switch (direction) {
@@ -55,12 +55,12 @@ class FadeTransitionPage extends PageRouteBuilder {
     required this.page,
     this.duration = const Duration(milliseconds: 400),
   }) : super(
-         pageBuilder: (context, animation, secondaryAnimation) => page,
-         transitionDuration: duration,
-         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-           return FadeTransition(opacity: animation, child: child);
-         },
-       );
+          pageBuilder: (context, animation, secondaryAnimation) => page,
+          transitionDuration: duration,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+        );
 }
 
 /// Smooth scale transition
@@ -72,20 +72,20 @@ class ScaleTransitionPage extends PageRouteBuilder {
     required this.page,
     this.duration = const Duration(milliseconds: 500),
   }) : super(
-         pageBuilder: (context, animation, secondaryAnimation) => page,
-         transitionDuration: duration,
-         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-           final tween = Tween(begin: 0.0, end: 1.0);
-           final scaleTween = animation.drive(
-             tween.chain(CurveTween(curve: Curves.easeOutBack)),
-           );
+          pageBuilder: (context, animation, secondaryAnimation) => page,
+          transitionDuration: duration,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final tween = Tween(begin: 0.0, end: 1.0);
+            final scaleTween = animation.drive(
+              tween.chain(CurveTween(curve: Curves.easeOutBack)),
+            );
 
-           return ScaleTransition(
-             scale: scaleTween,
-             child: FadeTransition(opacity: animation, child: child),
-           );
-         },
-       );
+            return ScaleTransition(
+              scale: scaleTween,
+              child: FadeTransition(opacity: animation, child: child),
+            );
+          },
+        );
 }
 
 /// Animation builder for staggered animations
@@ -97,13 +97,13 @@ class StaggeredAnimationBuilder extends StatefulWidget {
   final Axis direction;
 
   const StaggeredAnimationBuilder({
-    Key? key,
+    super.key,
     required this.children,
     this.duration = const Duration(milliseconds: 500),
     this.delay = const Duration(milliseconds: 100),
     this.curve = Curves.easeOutCubic,
     this.direction = Axis.vertical,
-  }) : super(key: key);
+  });
 
   @override
   State<StaggeredAnimationBuilder> createState() =>
@@ -198,13 +198,13 @@ class AnimatedCounter extends StatefulWidget {
   final String? suffix;
 
   const AnimatedCounter({
-    Key? key,
+    super.key,
     required this.end,
     this.duration = const Duration(milliseconds: 1000),
     this.textStyle,
     this.prefix,
     this.suffix,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedCounter> createState() => _AnimatedCounterState();

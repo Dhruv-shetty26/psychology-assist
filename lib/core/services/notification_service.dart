@@ -25,10 +25,10 @@ class NotificationService {
     // iOS initialization settings
     const DarwinInitializationSettings iosInitSettings =
         DarwinInitializationSettings(
-          requestAlertPermission: true,
-          requestBadgePermission: true,
-          requestSoundPermission: true,
-        );
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
 
     const InitializationSettings initSettings = InitializationSettings(
       android: androidInitSettings,
@@ -42,8 +42,7 @@ class NotificationService {
   Future<bool> requestPermissions() async {
     final permissions = await _notificationsPlugin
         .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin
-        >()
+            IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(alert: true, badge: true, sound: true);
 
     return permissions ?? false;
@@ -58,12 +57,12 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'psychol_channel',
-          'Psychol Notifications',
-          channelDescription: 'Mood check-ins and reminders',
-          importance: Importance.high,
-          priority: Priority.high,
-        );
+      'psychol_channel',
+      'Psychol Notifications',
+      channelDescription: 'Mood check-ins and reminders',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
 
@@ -84,13 +83,13 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'psychol_checkin',
-          'Mood Check-ins',
-          channelDescription: 'Daily mood check-in reminders',
-          importance: Importance.high,
-          priority: Priority.high,
-          enableVibration: true,
-        );
+      'psychol_checkin',
+      'Mood Check-ins',
+      channelDescription: 'Daily mood check-in reminders',
+      importance: Importance.high,
+      priority: Priority.high,
+      enableVibration: true,
+    );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
 
@@ -145,13 +144,13 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'psychol_medication',
-          'Medication Reminders',
-          channelDescription: 'Daily medication reminders',
-          importance: Importance.high,
-          priority: Priority.high,
-          enableVibration: true,
-        );
+      'psychol_medication',
+      'Medication Reminders',
+      channelDescription: 'Daily medication reminders',
+      importance: Importance.high,
+      priority: Priority.high,
+      enableVibration: true,
+    );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
 

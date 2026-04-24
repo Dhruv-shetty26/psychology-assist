@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Riverpod provider for user preferences (theme, notifications, etc.)
 final userPreferencesProvider =
     StateNotifierProvider<UserPreferencesNotifier, UserPreferences>(
-      (ref) => UserPreferencesNotifier(),
-    );
+  (ref) => UserPreferencesNotifier(),
+);
 
 class UserPreferences {
   final bool notificationsEnabled;

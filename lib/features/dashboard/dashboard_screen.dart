@@ -7,7 +7,7 @@ import '../../core/widgets/smooth_widgets.dart';
 import '../../core/widgets/animations.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
@@ -59,6 +59,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: StaggeredAnimationBuilder(
+            duration: const Duration(milliseconds: 600),
+            delay: const Duration(milliseconds: 80),
             children: [
               // Weekly Mood Trend Card
               SmoothCard(
@@ -71,8 +73,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                       children: [
                         Text(
                           'Mood Trend',
-                          style: AppTypography.headingSmall
-                              .copyWith(color: theme.textTheme.titleMedium?.color),
+                          style: AppTypography.headingSmall.copyWith(
+                              color: theme.textTheme.titleMedium?.color),
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -102,7 +104,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         7,
                         (i) => _MoodBar(
                           height: 30 + (i % 3) * 20,
-                          label: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i],
+                          label: [
+                            'Mon',
+                            'Tue',
+                            'Wed',
+                            'Thu',
+                            'Fri',
+                            'Sat',
+                            'Sun'
+                          ][i],
                           color: [
                             AppColors.moodPoor,
                             AppColors.moodGood,
@@ -181,14 +191,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
                         children: [
                           Text(
                             'Wellness Tip',
-                            style: AppTypography.labelLarge
-                                .copyWith(color: theme.textTheme.labelLarge?.color),
+                            style: AppTypography.labelLarge.copyWith(
+                                color: theme.textTheme.labelLarge?.color),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Regular mood tracking helps identify patterns and triggers.',
-                            style: AppTypography.bodySmall
-                                .copyWith(color: theme.textTheme.bodySmall?.color),
+                            style: AppTypography.bodySmall.copyWith(
+                                color: theme.textTheme.bodySmall?.color),
                           ),
                         ],
                       ),
@@ -213,8 +223,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen>
               ),
               const SizedBox(height: 32),
             ],
-            duration: const Duration(milliseconds: 600),
-            delay: const Duration(milliseconds: 80),
           ),
         ),
       ),

@@ -39,36 +39,6 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       body: IndexedStack(index: currentIndex, children: pages),
-      floatingActionButton: !isPsychologist && currentIndex == 0
-          ? Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    scheme.primary,
-                    scheme.tertiary,
-                  ],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: scheme.primary.withValues(alpha: 0.35),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: FloatingActionButton(
-                onPressed: () => _showAiChat(context),
-                tooltip: 'AI chat',
-                elevation: 0,
-                backgroundColor: Colors.transparent,
-                child: const Icon(Icons.smart_toy_outlined, color: Colors.white),
-              ),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: _PillBottomNavigation(
         selectedIndex: currentIndex,
         isPsychologist: isPsychologist,
@@ -76,15 +46,6 @@ class HomeScreen extends ConsumerWidget {
           ref.read(selectedTabProvider.notifier).state = index;
         },
       ),
-    );
-  }
-
-  void _showAiChat(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const CalmoraAiSheet(),
     );
   }
 }

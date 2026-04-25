@@ -68,7 +68,8 @@ class AppSessionStore {
       'prescriptions': session.prescriptions.map(_prescriptionToJson).toList(),
       'moodEntries': session.moodEntries.map(_moodEntryToJson).toList(),
       'journalEntries':
-          session.journalEntries.map(_journalEntryToJson).toList(),
+          session.journalEntries.map((e) => e.toJson()).toList(),
+      'messages': session.messages.map((e) => e.toJson()).toList(),
       'lastUnlockedAt': session.lastUnlockedAt?.toIso8601String(),
       'lockTimeoutMinutes': session.lockTimeoutMinutes,
     };
@@ -85,7 +86,10 @@ class AppSessionStore {
         .map((item) => _moodEntryFromJson(item as Map<String, dynamic>))
         .toList();
     final journalEntries = (json['journalEntries'] as List<dynamic>? ?? [])
-        .map((item) => _journalEntryFromJson(item as Map<String, dynamic>))
+        .map((item) => JournalEntry.fromJson(item as Map<String, dynamic>))
+        .toList();
+    final messages = (json['messages'] as List<dynamic>? ?? [])
+        .map((item) => ChatMessage.fromJson(item as Map<String, dynamic>))
         .toList();
 
     return AppSession(
@@ -99,6 +103,7 @@ class AppSessionStore {
       prescriptions: prescriptions,
       moodEntries: moodEntries,
       journalEntries: journalEntries,
+      messages: messages,
       lastUnlockedAt: json['lastUnlockedAt'] == null
           ? null
           : DateTime.parse(json['lastUnlockedAt'] as String),
@@ -224,19 +229,7 @@ class AppSessionStore {
     );
   }
 
-  Map<String, dynamic> _journalEntryToJson(JournalEntry entry) {
-    return {
-      'createdAt': entry.createdAt.toIso8601String(),
-      'content': entry.content,
-    };
-  }
 
-  JournalEntry _journalEntryFromJson(Map<String, dynamic> json) {
-    return JournalEntry(
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      content: json['content'] as String? ?? '',
-    );
-  }
 
   String _psychologistNameForEmail(String email) {
     return demoPsychologists

@@ -8,6 +8,7 @@ import '../../app/home_screen.dart';
 import '../../app/theme_provider.dart';
 import '../../app/user_preferences_provider.dart';
 import '../../core/services/notification_service.dart';
+import '../../core/services/nfc_service.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/app_snackbar.dart';
@@ -340,6 +341,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
                         ],
                       ),
                     ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              _SettingsSection(
+                title: 'NFC Integration',
+                children: [
+                  SmoothCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Quick Actions',
+                          style: AppTypography.labelLarge.copyWith(
+                            color: theme.textTheme.labelLarge?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Program an NFC tag to quickly launch a feature by tapping it against your phone.',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: theme.textTheme.bodySmall?.color,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton.icon(
+                          onPressed: _showNfcProgrammingDialog,
+                          icon: const Icon(Icons.nfc),
+                          label: const Text('Program NFC Tag'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -826,6 +861,101 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen>
         ],
       ),
     );
+  }
+
+  void _showNfcProgrammingDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Program NFC Tag'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.auto_stories),
+                title: const Text('Open Journal'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _startNfcWriteSession('journal');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.mood),
+                title: const Text('Log Mood'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _startNfcWriteSession('mood');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.event_available),
+                title: const Text('Book Appointment'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _startNfcWriteSession('appointment');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.sos, color: Colors.red),
+                title: const Text('SOS Alert'),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _startNfcWriteSession('sos');
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _startNfcWriteSession(String featureId) async {
+    final available = await NfcService().isAvailable();
+    if (!available) {
+      if (mounted) {
+        AppSnackBar.showError(context, title: 'NFC not available', message: 'Your device does not support NFC or it is turned off.');
+      }
+      return;
+    }
+
+    if (mounted) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return const AlertDialog(
+            title: Text('Ready to Write'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.nfc, size: 64),
+                SizedBox(height: 16),
+                Text('Hold your device near an NFC tag...'),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+    final success = await NfcService().writeFeatureToTag(featureId);
+
+    if (mounted) {
+      Navigator.of(context).pop(); // dismiss writing dialog
+      if (success) {
+        AppSnackBar.showSuccess(context, title: 'Success', message: 'NFC tag programmed successfully!');
+      } else {
+        AppSnackBar.showError(context, title: 'Error', message: 'Failed to program NFC tag.');
+      }
+    }
   }
 
   void _showBugReport() {

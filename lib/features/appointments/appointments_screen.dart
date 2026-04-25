@@ -6,6 +6,7 @@ import '../../core/theme/app_typography.dart';
 import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/smooth_widgets.dart';
 import '../psychologists/psychologists_screen.dart';
+import '../chat/chat_screen.dart';
 
 class AppointmentsScreen extends ConsumerStatefulWidget {
   const AppointmentsScreen({super.key});
@@ -422,20 +423,46 @@ class _AppointmentsHero extends StatelessWidget {
           ),
           if (!isPsychologist) ...[
             const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const PsychologistsScreen(),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const PsychologistsScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.search, size: 16),
+                  label: const Text('Find a Psychologist'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
                   ),
-                );
-              },
-              icon: const Icon(Icons.search, size: 16),
-              label: const Text('Find a Psychologist'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
-              ),
+                ),
+                if (profile?.hasPsychologist == true)
+                  FilledButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => ChatScreen(
+                            otherUserId: profile!.psychologistEmail!,
+                            otherUserName: 'Your Therapist',
+                            currentUserId: 'patient', // Demo current user id
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.chat_bubble, size: 16),
+                    label: const Text('Message Therapist'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.deepViolet,
+                    ),
+                  ),
+              ],
             ),
           ],
         ],

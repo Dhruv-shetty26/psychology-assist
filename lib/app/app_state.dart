@@ -197,20 +197,97 @@ class MoodEntry {
 class JournalEntry {
   final DateTime createdAt;
   final String content;
+  final String? summary;
+  final bool sharedWithPsychologist;
 
   const JournalEntry({
     required this.createdAt,
     required this.content,
+    this.summary,
+    this.sharedWithPsychologist = false,
   });
+
+  JournalEntry copyWith({
+    DateTime? createdAt,
+    String? content,
+    String? summary,
+    bool? sharedWithPsychologist,
+  }) {
+    return JournalEntry(
+      createdAt: createdAt ?? this.createdAt,
+      content: content ?? this.content,
+      summary: summary ?? this.summary,
+      sharedWithPsychologist:
+          sharedWithPsychologist ?? this.sharedWithPsychologist,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'createdAt': createdAt.toIso8601String(),
         'content': content,
+        'summary': summary,
+        'sharedWithPsychologist': sharedWithPsychologist,
       };
 
   factory JournalEntry.fromJson(Map<String, dynamic> json) => JournalEntry(
         createdAt: DateTime.parse(json['createdAt'] as String),
         content: json['content'] as String,
+        summary: json['summary'] as String?,
+        sharedWithPsychologist: json['sharedWithPsychologist'] as bool? ?? false,
+      );
+}
+
+class ChatMessage {
+  final String id;
+  final String senderId;
+  final String receiverId;
+  final String content;
+  final DateTime timestamp;
+  final bool isRead;
+
+  const ChatMessage({
+    required this.id,
+    required this.senderId,
+    required this.receiverId,
+    required this.content,
+    required this.timestamp,
+    this.isRead = false,
+  });
+
+  ChatMessage copyWith({
+    String? id,
+    String? senderId,
+    String? receiverId,
+    String? content,
+    DateTime? timestamp,
+    bool? isRead,
+  }) {
+    return ChatMessage(
+      id: id ?? this.id,
+      senderId: senderId ?? this.senderId,
+      receiverId: receiverId ?? this.receiverId,
+      content: content ?? this.content,
+      timestamp: timestamp ?? this.timestamp,
+      isRead: isRead ?? this.isRead,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'senderId': senderId,
+        'receiverId': receiverId,
+        'content': content,
+        'timestamp': timestamp.toIso8601String(),
+        'isRead': isRead,
+      };
+
+  factory ChatMessage.fromJson(Map<String, dynamic> json) => ChatMessage(
+        id: json['id'] as String,
+        senderId: json['senderId'] as String,
+        receiverId: json['receiverId'] as String,
+        content: json['content'] as String,
+        timestamp: DateTime.parse(json['timestamp'] as String),
+        isRead: json['isRead'] as bool? ?? false,
       );
 }
 
@@ -272,6 +349,7 @@ class AppSession {
   final List<Prescription> prescriptions;
   final List<MoodEntry> moodEntries;
   final List<JournalEntry> journalEntries;
+  final List<ChatMessage> messages;
   final bool isLocked;
   final DateTime? lastUnlockedAt;
   final int lockTimeoutMinutes;
@@ -287,6 +365,7 @@ class AppSession {
     this.prescriptions = const [],
     this.moodEntries = const [],
     this.journalEntries = const [],
+    this.messages = const [],
     this.isLocked = false,
     this.lastUnlockedAt,
     this.lockTimeoutMinutes = 10,
@@ -303,6 +382,7 @@ class AppSession {
     List<Prescription>? prescriptions,
     List<MoodEntry>? moodEntries,
     List<JournalEntry>? journalEntries,
+    List<ChatMessage>? messages,
     bool? isLocked,
     DateTime? lastUnlockedAt,
     int? lockTimeoutMinutes,
@@ -318,6 +398,7 @@ class AppSession {
       prescriptions: prescriptions ?? this.prescriptions,
       moodEntries: moodEntries ?? this.moodEntries,
       journalEntries: journalEntries ?? this.journalEntries,
+      messages: messages ?? this.messages,
       isLocked: isLocked ?? this.isLocked,
       lastUnlockedAt: lastUnlockedAt ?? this.lastUnlockedAt,
       lockTimeoutMinutes: lockTimeoutMinutes ?? this.lockTimeoutMinutes,
@@ -427,6 +508,35 @@ class AppSessionNotifier extends StateNotifier<AppSession> {
     );
     final updated = [...state.journalEntries, entry];
     state = state.copyWith(journalEntries: updated);
+    _persist();
+  }
+
+  void updateJournalEntry(JournalEntry entry) {
+    final updated = state.journalEntries.map((e) {
+      if (e.createdAt == entry.createdAt) {
+        return entry;
+      }
+      return e;
+    }).toList();
+    state = state.copyWith(journalEntries: updated);
+    _persist();
+  }
+
+  void addMessage(ChatMessage message) {
+    final updated = [...state.messages, message]
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    state = state.copyWith(messages: updated);
+    _persist();
+  }
+
+  void markMessagesAsRead(String fromSenderId) {
+    final updated = state.messages.map((m) {
+      if (m.senderId == fromSenderId && !m.isRead) {
+        return m.copyWith(isRead: true);
+      }
+      return m;
+    }).toList();
+    state = state.copyWith(messages: updated);
     _persist();
   }
 

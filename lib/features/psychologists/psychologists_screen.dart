@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/smooth_widgets.dart';
+import '../chat/chat_screen.dart';
 
 class PsychologistsScreen extends ConsumerWidget {
   const PsychologistsScreen({super.key});
@@ -90,6 +91,9 @@ class _PsychologistDashboard extends ConsumerWidget {
     final prescriptions = session.prescriptions
         .where((prescription) => prescription.prescribedByEmail == email)
         .toList();
+    final sharedJournals = session.journalEntries
+        .where((entry) => entry.sharedWithPsychologist)
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -171,6 +175,91 @@ class _PsychologistDashboard extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
+                // Active Patients (Local Device User)
+                Text(
+                  'Active Patients',
+                  style: AppTypography.headingMedium,
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: SmoothCard(
+                    borderRadius: 16,
+                    padding: const EdgeInsets.all(16),
+                    backgroundColor: AppColors.neonViolet.withValues(alpha: 0.1),
+                    borderColor: AppColors.neonViolet.withValues(alpha: 0.3),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: AppColors.neonViolet,
+                          child: const Icon(Icons.person, color: Colors.white),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Demo Patient',
+                                style: AppTypography.labelLarge,
+                              ),
+                              Text(
+                                'demo@patient.com',
+                                style: AppTypography.bodySmall,
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  OutlinedButton.icon(
+                                    onPressed: () {
+                                      // Mock an appointment to pass to the prescription dialog
+                                      final mockAppt = Appointment(
+                                        psychologistEmail: email,
+                                        psychologistName: 'Psychologist',
+                                        patientName: 'Demo Patient',
+                                        patientEmail: 'demo@patient.com',
+                                        startsAt: DateTime.now(),
+                                        type: 'Therapy',
+                                        note: '',
+                                      );
+                                      _showPrescriptionDialog(context, ref, mockAppt);
+                                    },
+                                    icon: const Icon(Icons.medical_services, size: 16),
+                                    label: const Text('Prescribe'),
+                                    style: OutlinedButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  FilledButton.icon(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute<void>(
+                                          builder: (_) => ChatScreen(
+                                            otherUserId: 'patient', 
+                                            otherUserName: 'Demo Patient',
+                                            currentUserId: email,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.chat_bubble, size: 16),
+                                    label: const Text('Message'),
+                                    style: FilledButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
                 // Pending Appointments
                 if (pendingAppointments.isNotEmpty) ...[
                   Text(
@@ -210,7 +299,95 @@ class _PsychologistDashboard extends ConsumerWidget {
                   ...confirmedAppointments.map(
                     (appointment) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: _ConfirmedAppointmentCard(appointment: appointment),
+                      child: _ConfirmedAppointmentCard(
+                        appointment: appointment,
+                        onPrescribe: () => _showPrescriptionDialog(context, ref, appointment),
+                        onMessage: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => ChatScreen(
+                                otherUserId: 'patient', // Demo patient ID
+                                otherUserName: appointment.patientName,
+                                currentUserId: appointment.psychologistEmail, // Current psychologist ID
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+
+                // Patient Insights (Shared Journals)
+                if (sharedJournals.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  Text(
+                    'Patient Insights',
+                    style: AppTypography.headingMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  ...sharedJournals.map(
+                    (entry) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: SmoothCard(
+                        borderRadius: 16,
+                        padding: const EdgeInsets.all(16),
+                        backgroundColor: AppColors.neonViolet.withOpacity(0.05),
+                        borderColor: AppColors.neonViolet.withOpacity(0.2),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Shared Entry',
+                                  style: AppTypography.labelLarge,
+                                ),
+                                Text(
+                                  _formatDate(entry.createdAt),
+                                  style: AppTypography.caption,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              entry.content,
+                              style: AppTypography.bodySmall,
+                            ),
+                            if (entry.summary != null) ...[
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.neonViolet.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.auto_awesome, size: 14, color: AppColors.neonViolet),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'AI Summary',
+                                          style: AppTypography.labelSmall.copyWith(color: AppColors.neonViolet),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      entry.summary!,
+                                      style: AppTypography.bodySmall,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -344,6 +521,44 @@ class _PsychologistDashboard extends ConsumerWidget {
                     )
                     .toList(),
               ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Reminder Times', style: AppTypography.labelLarge),
+                  TextButton.icon(
+                    onPressed: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (time != null) {
+                        final newTime = MedicationTime(hour: time.hour, minute: time.minute);
+                        if (!selectedTimes.contains(newTime)) {
+                          setDialogState(() => selectedTimes.add(newTime));
+                        }
+                      }
+                    },
+                    icon: const Icon(Icons.add_alarm, size: 16),
+                    label: const Text('Add Time'),
+                  ),
+                ],
+              ),
+              if (selectedTimes.isNotEmpty)
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: selectedTimes
+                      .map(
+                        (time) => InputChip(
+                          label: Text(time.toDisplayString()),
+                          onDeleted: () {
+                            setDialogState(() => selectedTimes.remove(time));
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
               const SizedBox(height: 12),
               TextField(
                 controller: noteController,
@@ -518,8 +733,14 @@ class _AppointmentRequestCard extends StatelessWidget {
 
 class _ConfirmedAppointmentCard extends StatelessWidget {
   final Appointment appointment;
+  final VoidCallback onPrescribe;
+  final VoidCallback onMessage;
 
-  const _ConfirmedAppointmentCard({required this.appointment});
+  const _ConfirmedAppointmentCard({
+    required this.appointment,
+    required this.onPrescribe,
+    required this.onMessage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -554,6 +775,28 @@ class _ConfirmedAppointmentCard extends StatelessWidget {
                       fontStyle: FontStyle.italic,
                     ),
                   ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: onPrescribe,
+                      icon: const Icon(Icons.medical_services, size: 16),
+                      label: const Text('Prescribe'),
+                      style: OutlinedButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton.icon(
+                      onPressed: onMessage,
+                      icon: const Icon(Icons.chat_bubble, size: 16),
+                      label: const Text('Message'),
+                      style: FilledButton.styleFrom(
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

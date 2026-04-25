@@ -17,4 +17,4 @@ Built with clean architechure, vibecoded and improved in 24h as part of Xypheria
 - **AI Model**: Ollama (Llama 3.2)
 - **Notifications**: flutter_local_notifications 
 
-<BREW>
+&lt;BREW&gt;

@@ -1,5 +1,5 @@
 # Calmora
-Built with clean architechure, vibecoded and improved in 24h as part of Xypheria Hackathon at Alvas. A special theme similar to the Xypheria Hackathon is also made under the name "Journal" </br>
+Built with clean architechure, vibecoded and improved in 24h as part of Xypheria Hackathon at Alvas. A special theme similar to the Xypheria Hackathon is also made under the name "Journal". </br>
 
 ## Architecture
 - **State Management**: Riverpod
@@ -17,3 +17,4 @@ Built with clean architechure, vibecoded and improved in 24h as part of Xypheria
 - **AI Model**: Ollama (Llama 3.2)
 - **Notifications**: flutter_local_notifications 
 
+<BREW>
